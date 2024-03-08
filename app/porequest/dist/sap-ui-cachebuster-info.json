@@ -1,0 +1,21 @@
+{
+  "model/models-dbg.js": 1709883642030,
+  "manifest.json": 1709912110980,
+  "model/models.js": 1709883642030,
+  "model/formatter.js": 1709906875067,
+  "controller/Upload.controller.js": 1709909205023,
+  "Component.js": 1709909077812,
+  "Component-preload.js": 1709912111155,
+  "controller/Upload-dbg.controller.js": 1709909205023,
+  "model/formatter-dbg.js": 1709906875067,
+  "i18n/i18n.properties": 1709883670738,
+  "Component-dbg.js": 1709909077812,
+  "view/Upload.view.xml": 1709908459143,
+  "view/App.view.xml": 1709889694408,
+  "fragment/Remarks.fragment.xml": 1709908550847,
+  "fragment/Edit.fragment.xml": 1709907768930,
+  "fragment/Create.fragment.xml": 1709906687884,
+  "fragment/Attachment.fragment.xml": 1709889756451,
+  "css/style.css": 1709883642034,
+  "index.html": 1709883642022
+}

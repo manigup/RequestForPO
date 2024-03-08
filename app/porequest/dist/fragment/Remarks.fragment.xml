@@ -1,0 +1,44 @@
+<Dialog
+    id="_IDGenDialog1"
+    xmlns:f="sap.ui.layout.form"
+    xmlns="sap.m"
+    draggable="true"
+    contentWidth="300px"
+    afterClose="onDialogClose"
+    titleAlignment="Center"
+>
+    <content>
+        <f:SimpleForm
+            id="_IDGenSimpleForm1"
+            editable="true"
+            layout="ResponsiveGridLayout"
+        >
+            <Label
+                id="_IDGenLabel2"
+                required="true"
+                design="Bold"
+                text="Enter Remarks"
+            />
+            <TextArea
+                growing="true"
+                id="remarks"
+            />
+        </f:SimpleForm>
+    </content>
+    <beginButton>
+        <Button
+            id="_IDGenButton1"
+            type="Emphasized"
+            text="Submit"
+            press="onRemarksSubmit"
+        />
+    </beginButton>
+    <endButton>
+        <Button
+            id="_IDGenButton2"
+            type="Reject"
+            text="Cancel"
+            press="onDialogCancel"
+        />
+    </endButton>
+</Dialog>
