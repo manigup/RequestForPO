@@ -9,7 +9,7 @@ entity PoList : managed {
       TotalInvoiceAmount : Integer;
       InvoiceType        : String;
       GST                : Integer;
-  key PONumber           : String;
+      PONumber           : String;
       EwayBillNumber     : String default '';
       EwayBillDate       : String(8) default '';
       Approver           : String @(restrict: [{

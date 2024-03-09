@@ -62,7 +62,6 @@ sap.ui.define([
                 this.getView().getModel("EditModel").refresh(true);
                 this.invNo = obj.InvoiceNumber;
                 this.id = obj.Id;
-                this.poNo = obj.PONumber;
                 this.getAttachments();
                 sap.ui.getCore().byId("attachment").setUploadUrl(this.getView().getModel().sServiceUrl + "/Attachments");
                 frag.open();
@@ -82,16 +81,15 @@ sap.ui.define([
 
             onCreatePress: function (evt) {
                 this.dialogSource = evt.getSource();
-                if (this.validateReqFields(["invDate", "invNo", "invAmmount", "gst", "invType", "po"]) && sap.ui.getCore().byId("attachment").getIncompleteItems().length > 0) {
+                if (this.validateReqFields(["invDate", "invNo", "invAmmount", "gst", "invType"]) && sap.ui.getCore().byId("attachment").getIncompleteItems().length > 0) {
                     BusyIndicator.show();
                     const payload = this.getView().getModel("DataModel").getData();
                     setTimeout(() => {
                         this.getView().getModel().create("/PoList", payload, {
                             success: sData => {
-                                this.toAddress = sData.HodApprover;
+                                this.toAddress = sData.Approver;
                                 this.invNo = sData.InvoiceNumber;
                                 this.id = sData.Id;
-                                this.poNo = sData.PONumber;
                                 this.doAttachment();
                             },
                             error: () => BusyIndicator.hide()
@@ -109,14 +107,13 @@ sap.ui.define([
                     const payload = this.getView().getModel("EditModel").getData();
                     payload.Action = "E";
                     setTimeout(() => {
-                        this.getView().getModel().update("/PoList(InvoiceNumber='" + this.invNo + "',Id='" + this.id
-                            + "',PONumber='" + this.poNo + "')", payload, {
+                        this.getView().getModel().update("/PoList(InvoiceNumber='" + this.invNo + "',Id='" + this.id + "')", payload, {
                             success: sData => {
                                 BusyIndicator.hide();
                                 MessageBox.success("Invoice " + sData.InvoiceNumber + " updated successfully", {
                                     onClose: () => {
-                                        this.toAddress = payload.HodApprover;
-                                        const content = "Invoice " + this.invNo + " with PO" + this.poNo + " updated by supplier " + sap.ui.getCore().loginEmail.split("@")[0] + ".";
+                                        this.toAddress = payload.Approver;
+                                        const content = "Invoice " + this.invNo + " updated by supplier " + sap.ui.getCore().loginEmail.split("@")[0] + ".";
                                         this.sendEmailNotification(content);
                                         this.dialogSource.getParent().destroy();
                                         this.getData();
@@ -140,13 +137,17 @@ sap.ui.define([
                         if (action === "YES") {
                             this.invNo = obj.InvoiceNumber;
                             this.id = obj.Id;
-                            this.poNo = obj.PONumber;
                             this.toAddress = obj.createdBy;
                             this.payload = { Action: selectedAction };
 
                             const remarksFrag = sap.ui.xmlfragment("com.extension.porequest.fragment.Remarks", this);
                             this.getView().addDependent(remarksFrag);
                             const title = selectedAction === "A" ? "Approval" : "Rejection";
+                            if (selectedAction === "A") {
+                                sap.ui.getCore().byId("po").setVisible(true);
+                            } else {
+                                sap.ui.getCore().byId("po").setVisible(false);
+                            }
                             remarksFrag.setTitle(title);
                             remarksFrag.open();
                         }
@@ -157,8 +158,12 @@ sap.ui.define([
 
             onRemarksSubmit: function (evt) {
                 this.dialogSource = evt.getSource();
-                if (this.validateReqFields(["remarks"])) {
+                const reqFields = this.payload.Action === "A" ? ["po", "remarks"] : ["remarks"];
+                if (this.validateReqFields(reqFields)) {
                     this.payload.ApproverRemarks = sap.ui.getCore().byId("remarks").getValue();
+                    if (this.payload.Action === "A") {
+                        this.payload.PONumber = sap.ui.getCore().byId("po").getValue();
+                    }
                     this.takeAction();
                 } else {
                     MessageBox.error("Please fill all required inputs to proceed");
@@ -167,8 +172,7 @@ sap.ui.define([
 
             takeAction: function () {
                 setTimeout(() => {
-                    this.getView().getModel().update("/PoList(Id='" + this.id + "',InvoiceNumber='" + this.invNo
-                        + "',PONumber='" + this.poNo + "')", this.payload, {
+                    this.getView().getModel().update("/PoList(Id='" + this.id + "',InvoiceNumber='" + this.invNo + "')", this.payload, {
                         success: () => {
                             BusyIndicator.hide();
                             MessageBox.success("Action taken successfully", {
@@ -182,7 +186,7 @@ sap.ui.define([
                                             content = " rejected by purchase team.";
                                             break;
                                     }
-                                    this.sendEmailNotification("Invoice " + this.invNo + " with PO " + this.poNo + content);
+                                    this.sendEmailNotification("Invoice " + this.invNo + content);
                                     this.dialogSource.getParent().destroy();
                                     this.getData();
                                 }
@@ -232,7 +236,7 @@ sap.ui.define([
                     BusyIndicator.hide();
                     MessageBox.success("Invoice " + this.invNo + " uploaded successfully", {
                         onClose: () => {
-                            const content = "Invoice " + this.invNo + " with PO " + this.poNo + " uploaded by supplier " + sap.ui.getCore().loginEmail.split("@")[0] + ".";
+                            const content = "Invoice " + this.invNo + " uploaded by supplier " + sap.ui.getCore().loginEmail.split("@")[0] + ".";
                             this.sendEmailNotification(content);
                             this.getView().getModel("DataModel").setData({});
                             this.dialogSource.getParent().destroy();
@@ -293,7 +297,7 @@ sap.ui.define([
 
             sendEmailNotification: function (body) {
                 const link = window.location.origin +
-                    "/site/SP#invupload-manage?sap-ui-app-id-hint=saas_approuter_com.extension.porequest";
+                    "site/SP#porequest-manage?sap-ui-app-id-hint=saas_approuter_com.extension.porequest";
                 return new Promise((resolve, reject) => {
                     const emailBody = `|| ${body} Kindly log-in with the link to take your action.<br><br><a href='${link}'>CLICK HERE</a>`,
                         oModel = this.getView().getModel(),

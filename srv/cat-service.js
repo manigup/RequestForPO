@@ -33,7 +33,15 @@ module.exports = cds.service.impl(async function () {
     this.before('UPDATE', 'PoList', async (req) => {
 
         if (req.data.Action === "A") {
+
+            const records = await cds.run(cds.parse.cql("Select PONumber from db.porequest.PoList")),
+                duplicatePo = records.filter(item => item.PONumber === req.data.PONumber);
+
+            if (duplicatePo.length > 0) {
+                req.reject(400, 'Duplicate po number');
+            }
             req.data.Status = "ABP" // approved by purchase
+
         } else if (req.data.Action === "E") {
             req.data.Status = "PWP" // pending with purchase
         } else {
@@ -47,14 +55,11 @@ module.exports = cds.service.impl(async function () {
             req.user.id = "samarnahak@kpmg.com";
         }
 
-        const records = await cds.run(cds.parse.cql("Select InvoiceNumber,PONumber from db.porequest.PoList")),
-            duplicateInvNo = records.filter(item => item.InvoiceNumber === req.data.InvoiceNumber),
-            duplicatePo = records.filter(item => item.PONumber === req.data.PONumber);
+        const records = await cds.run(cds.parse.cql("Select InvoiceNumber from db.porequest.PoList")),
+            duplicateInvNo = records.filter(item => item.InvoiceNumber === req.data.InvoiceNumber);
 
         if (duplicateInvNo.length > 0) {
             req.reject(400, 'Duplicate invoice number');
-        } else if (duplicatePo.length > 0) {
-            req.reject(400, 'Duplicate po number');
         }
 
         req.data.Status = "PWP"; // pending with purchase

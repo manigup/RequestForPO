@@ -80,15 +80,6 @@
                 />
             </Select>
             <Label
-                required="true"
-                design="Bold"
-                text="PO Number"
-            />
-            <Input
-                id="po"
-                value="{DataModel>/PONumber}"
-            />
-            <Label
                 design="Bold"
                 text="Eway Bill No."
             />

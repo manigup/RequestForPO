@@ -81,15 +81,6 @@
                 />
             </Select>
             <Label
-                required="true"
-                design="Bold"
-                text="PO Number"
-            />
-            <Input
-                value="{EditModel>/PONumber}"
-                enabled="false"
-            />
-            <Label
                 design="Bold"
                 text="Eway Bill No."
             />
