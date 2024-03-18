@@ -106,11 +106,17 @@
                     </fb:FilterItem>
                 </fb:filterItems>
             </fb:FilterBar>
+            <MessageStrip
+                id="_IDGenMessageStrip1"
+                type="Information"
+                class="sapUiTinyMargin"
+                text="DISCLAIMER: Creation of advance shiping note does not guarantee gate entry within imperial plant. Gate entry clearance will be subject to verification of valid PO &amp; Invoice."
+            />
             <ScrollContainer
                 id="_IDGenScrollContainer1"
                 horizontal="true"
                 vertical="true"
-                height="80%"
+                height="75%"
             >
                 <Table
                     id="uploadTbl"
@@ -207,6 +213,7 @@
                             />
                         </Column>
                         <Column
+                            id="_IDGenColumn11"
                             hAlign="Center"
                             width="7rem"
                             minScreenWidth="700px"
@@ -214,12 +221,14 @@
                             popinDisplay="Inline"
                         >
                             <Label
+                                id="_IDGenLabel7"
                                 design="Bold"
                                 text="Eway Bill No."
                                 wrapping="true"
                             />
                         </Column>
                         <Column
+                            id="_IDGenColumn120"
                             hAlign="Center"
                             width="7rem"
                             minScreenWidth="700px"
@@ -227,16 +236,19 @@
                             popinDisplay="Inline"
                         >
                             <Label
+                                id="_IDGenLabel8"
                                 design="Bold"
                                 text="Eway Bill Date"
                                 wrapping="true"
                             />
                         </Column>
                         <Column
+                            id="_IDGenColumn13"
                             hAlign="Center"
                             width="6rem"
                         >
                             <Label
+                                id="_IDGenLabel9"
                                 design="Bold"
                                 text="PO Number"
                                 wrapping="true"
@@ -329,11 +341,18 @@
                                     id="_IDGenText6"
                                     text="{InvoiceType}"
                                 />
-                                <Text text="{EwayBillNumber}" />
                                 <Text
+                                    id="_IDGenText10"
+                                    text="{EwayBillNumber}"
+                                />
+                                <Text
+                                    id="_IDGenText11"
                                     text="{path:'EwayBillDate',formatter:'formatter.formatDate'}"
                                 />
-                                <Text text="{PONumber}" />
+                                <Text
+                                    id="_IDGenText12"
+                                    text="{PONumber}"
+                                />
                                 <ObjectStatus
                                     id="_IDGenObjectStatus1"
                                     text="{path:'Status',formatter:'formatter.formatStatus'}"
