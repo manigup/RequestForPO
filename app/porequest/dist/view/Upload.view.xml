@@ -110,7 +110,7 @@
                 id="_IDGenMessageStrip1"
                 type="Information"
                 class="sapUiTinyMargin"
-                text="DISCLAIMER: Creation of advance shiping note does not guarantee gate entry within imperial plant. Gate entry clearance will be subject to verification of valid PO &amp; Invoice."
+                text="DISCLAIMER: Creation of Advance Shiping Note does not guarantee Gate Entry within plant. Gate Entry clearance will be subject to verification of valid PO &amp; Invoice."
             />
             <ScrollContainer
                 id="_IDGenScrollContainer1"
