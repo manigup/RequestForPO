@@ -222,7 +222,7 @@ sap.ui.define([
 
         sendEmailNotification: function (body) {
             const link = window.location.origin +
-                "site/SP#porequest-manage?sap-ui-app-id-hint=saas_approuter_com.extension.porequest";
+                "/site/SP#porequest-manage?sap-ui-app-id-hint=saas_approuter_com.extension.porequest";
             return new Promise((resolve, reject) => {
                 const emailBody = `|| ${body} Kindly log-in with the link to take your action.<br><br><a href='${link}'>CLICK HERE</a>`,
                     oModel = this.getView().getModel(),

@@ -133,8 +133,8 @@ sap.ui.define([
             var data = this.getView().getModel("ItemModel").getData();
             try {
                 for (var i = 0; i < data.length; i++) {
-                    data[i].PoList_Id = this.id;
-                    data[i].PoList_InvoiceNumber = this.invNo;
+                    data[i].InvoiceNumber_Id = this.id;
+                    data[i].InvoiceNumber_InvoiceNumber = this.invNo;
                     await this.createPoListItem(data[i]);
                 }
             } catch (error) {
@@ -222,7 +222,7 @@ sap.ui.define([
 
         sendEmailNotification: function (body) {
             const link = window.location.origin +
-                "site/SP#porequest-manage?sap-ui-app-id-hint=saas_approuter_com.extension.porequest";
+                "/site/SP#porequest-manage?sap-ui-app-id-hint=saas_approuter_com.extension.porequest";
             return new Promise((resolve, reject) => {
                 const emailBody = `|| ${body} Kindly log-in with the link to take your action.<br><br><a href='${link}'>CLICK HERE</a>`,
                     oModel = this.getView().getModel(),

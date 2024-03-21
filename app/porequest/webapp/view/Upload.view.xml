@@ -116,7 +116,7 @@
                 id="_IDGenScrollContainer1"
                 horizontal="true"
                 vertical="true"
-                height="75%"
+                height="70%"
             >
                 <Table
                     id="uploadTbl"
