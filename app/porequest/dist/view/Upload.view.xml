@@ -124,6 +124,7 @@
                     growing="true"
                     growingThreshold="40"
                     alternateRowColors="true"
+                    itemPress="onItempress" mode="SingleSelectMaster"
                 >
                     <columns>
                         <Column
@@ -313,7 +314,7 @@
                         </Column>
                     </columns>
                     <items>
-                        <ColumnListItem id="uploadTblTemp">
+                        <ColumnListItem id="uploadTblTemp" type="Navigation">
                             <cells>
                                 <ObjectIdentifier
                                     id="_IDGenObjectIdentifier1"

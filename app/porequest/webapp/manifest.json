@@ -120,6 +120,20 @@
           "target": [
             "TargetView1"
           ]
+        },
+        {
+          "pattern": "InvoiceCreate/:Id:/:InvNum:",
+          "name": "InvoiceCreate",
+          "view": "InvoiceCreate",
+          "targetAggregation": "pages",
+          "controlId": "app"
+        },
+        {
+          "pattern": "ItemDetails/{Id}/{Inv_Num}",
+          "name": "ItemDetails",
+          "view": "ItemDetails",
+          "targetAggregation": "pages",
+          "controlId": "app"
         }
       ],
       "targets": {

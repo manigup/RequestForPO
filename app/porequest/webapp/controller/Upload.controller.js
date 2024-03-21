@@ -14,10 +14,8 @@ sap.ui.define([
         return Controller.extend("com.extension.porequest.controller.Upload", {
 
             onInit: function () {
+                this.router = sap.ui.core.UIComponent.getRouterFor(this);
                 this.tblTemp = this.byId("uploadTblTemp").clone();
-                this.getView().setModel(new JSONModel(), "DataModel");
-                this.getView().setModel(new JSONModel({}), "EditModel");
-                this.getView().setModel(new JSONModel([]), "AttachmentModel");
                 this.getView().setModel(new JSONModel({}), "Filter");
             },
 
@@ -45,87 +43,24 @@ sap.ui.define([
                 this.getView().getModel("Filter").refresh(true);
             },
 
-            onAddPress: function () {
-                const createFrag = sap.ui.xmlfragment("com.extension.porequest.fragment.Create", this);
-                this.getView().addDependent(createFrag);
-                this.getView().getModel("DataModel").setData({});
-                this.getView().getModel("DataModel").refresh(true);
-                sap.ui.getCore().byId("attachment").setUploadUrl(this.getView().getModel().sServiceUrl + "/Attachments");
-                createFrag.open();
-            },
-
-            onInvNoPress: function (evt) {
-                const obj = evt.getSource().getBindingContext().getObject();
-                const frag = sap.ui.xmlfragment("com.extension.porequest.fragment.Edit", this);
-                this.getView().addDependent(frag);
-                this.getView().getModel("EditModel").setData(obj);
-                this.getView().getModel("EditModel").refresh(true);
-                this.invNo = obj.InvoiceNumber;
-                this.id = obj.Id;
-                this.getAttachments();
-                sap.ui.getCore().byId("attachment").setUploadUrl(this.getView().getModel().sServiceUrl + "/Attachments");
-                frag.open();
-            },
-
-            getAttachments: function () {
-                this.getView().getModel().read("/Attachments", {
-                    filters: [new Filter("Id", "EQ", this.id)],
-                    success: data => {
-                        this.getView().getModel("AttachmentModel").setData(data.results);
-                        this.getView().getModel("AttachmentModel").refresh(true);
-                        BusyIndicator.hide();
-                    },
-                    error: () => BusyIndicator.hide()
+            onItempress: function (evt) {
+                const data = evt.getParameter("listItem").getBindingContext().getObject();
+                this.router.navTo("ItemDetails", {
+                    "Id": data.Id,
+                    "Inv_Num": data.InvoiceNumber
                 });
             },
 
-            onCreatePress: function (evt) {
-                this.dialogSource = evt.getSource();
-                if (this.validateReqFields(["invDate", "invNo", "invAmmount", "gst", "invType"]) && sap.ui.getCore().byId("attachment").getIncompleteItems().length > 0) {
-                    BusyIndicator.show();
-                    const payload = this.getView().getModel("DataModel").getData();
-                    setTimeout(() => {
-                        this.getView().getModel().create("/PoList", payload, {
-                            success: sData => {
-                                this.toAddress = sData.Approver;
-                                this.invNo = sData.InvoiceNumber;
-                                this.id = sData.Id;
-                                this.doAttachment();
-                            },
-                            error: () => BusyIndicator.hide()
-                        });
-                    }, 500);
-                } else {
-                    MessageBox.error("Please fill all required inputs to proceed");
-                }
+            onAddPress: function () {
+                this.router.navTo("InvoiceCreate");
             },
 
-            onEditPress: function (evt) {
-                this.dialogSource = evt.getSource();
-                if (this.validateReqFields(["invDate", "invNo", "invAmmount", "gst", "invType"])) {
-                    BusyIndicator.show();
-                    const payload = this.getView().getModel("EditModel").getData();
-                    payload.Action = "E";
-                    setTimeout(() => {
-                        this.getView().getModel().update("/PoList(InvoiceNumber='" + this.invNo + "',Id='" + this.id + "')", payload, {
-                            success: sData => {
-                                BusyIndicator.hide();
-                                MessageBox.success("Invoice " + sData.InvoiceNumber + " updated successfully", {
-                                    onClose: () => {
-                                        this.toAddress = payload.Approver;
-                                        const content = "Invoice " + this.invNo + " updated by supplier " + sap.ui.getCore().loginEmail.split("@")[0] + ".";
-                                        this.sendEmailNotification(content);
-                                        this.dialogSource.getParent().destroy();
-                                        this.getData();
-                                    }
-                                });
-                            },
-                            error: () => BusyIndicator.hide()
-                        });
-                    }, 500);
-                } else {
-                    MessageBox.error("Please fill all required inputs to proceed");
-                }
+            onInvNoPress: function (evt) {
+                const data = evt.getSource().getBindingContext().getObject();
+                this.router.navTo("InvoiceCreate", {
+                    "Id": data.Id,
+                    "InvNum": data.InvoiceNumber
+                });
             },
 
             onActionChange: function (evt) {
@@ -214,48 +149,6 @@ sap.ui.define([
                 else return false;
             },
 
-            doAttachment: function () {
-                this.items = sap.ui.getCore().byId("attachment").getIncompleteItems();
-                sap.ui.getCore().byId("attachment").uploadItem(this.items[0]);
-                this.items.splice(0, 1);
-            },
-
-            onAttachItemAdd: function (evt) {
-                evt.getParameter("item").setVisibleEdit(false).setVisibleRemove(false);
-            },
-
-            onBeforeUploadStarts: function (evt) {
-                evt.getParameter("item").addHeaderField(new sap.ui.core.Item({
-                    key: "slug",
-                    text: this.id + "/" + evt.getParameter("item").getFileName()
-                }));
-            },
-
-            onUploadComplete: function () {
-                if (sap.ui.getCore().byId("attachment").getIncompleteItems().length === 0) {
-                    BusyIndicator.hide();
-                    MessageBox.success("Invoice " + this.invNo + " uploaded successfully", {
-                        onClose: () => {
-                            const content = "Invoice " + this.invNo + " uploaded by supplier " + sap.ui.getCore().loginEmail.split("@")[0] + ".";
-                            this.sendEmailNotification(content);
-                            this.getView().getModel("DataModel").setData({});
-                            this.dialogSource.getParent().destroy();
-                            this.getData();
-                        }
-                    });
-                } else {
-                    sap.ui.getCore().byId("attachment").uploadItem(this.items[0]);
-                    this.items.splice(0, 1);
-                }
-            },
-
-            onAttachmentUploadComplete: function () {
-                if (sap.ui.getCore().byId("attachment").getIncompleteItems().length > 0) {
-                    sap.ui.getCore().byId("attachment").uploadItem(this.items[0]);
-                    this.items.splice(0, 1);
-                }
-            },
-
             onAttachmentPress: function (evt) {
                 BusyIndicator.show();
                 const source = evt.getSource(),
@@ -275,14 +168,6 @@ sap.ui.define([
                         error: () => BusyIndicator.hide()
                     });
                 }, 1000);
-            },
-
-            onDialogClose: function (evt) {
-                evt.getSource().destroy();
-            },
-
-            onDialogCancel: function (evt) {
-                evt.getSource().getParent().destroy();
             },
 
             onPopOverClosePress: function (evt) {

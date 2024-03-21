@@ -44,6 +44,10 @@ module.exports = cds.service.impl(async function () {
 
         } else if (req.data.Action === "E") {
             req.data.Status = "PWP" // pending with purchase
+
+            const { PoListItems } = cds.entities("db.porequest");
+            let sInsertQuery = UPSERT.into(PoListItems).entries(req.data.Items);
+            await cds.tx(req).run(sInsertQuery).catch((err) => console.log(err.message));
         } else {
             req.data.Status = "RBP" // rejected by purchase
         }

@@ -80,16 +80,16 @@
                     text="{Type}"
                 />
             </Select>
-            <Label
+            <Label id="_IDGenLabel9"
                 design="Bold"
                 text="Eway Bill No."
             />
-            <Input value="{EditModel>/EwayBillNumber}" />
-            <Label
+            <Input id="_IDGenInput1" value="{EditModel>/EwayBillNumber}" />
+            <Label id="_IDGenLabel10"
                 design="Bold"
                 text="Eway Bill Date"
             />
-            <DatePicker
+            <DatePicker id="_IDGenDatePicker1"
                 value="{EditModel>/EwayBillDate}"
                 valueFormat="yyyyMMdd"
             />

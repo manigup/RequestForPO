@@ -10,6 +10,14 @@ service CatalogService {
             modifiedBy
         };
 
+    entity PoListItems as
+        projection on my.PoListItems
+        excluding {
+            createdAt,
+            modifiedAt,
+            modifiedBy
+        };
+
     @readonly
     entity InvoiceType as projection on my.InvoiceType;
 

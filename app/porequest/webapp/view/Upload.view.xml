@@ -109,7 +109,7 @@
             <MessageStrip
                 id="_IDGenMessageStrip1"
                 type="Information"
-                class="sapUiTinyMargin"
+                class="sapUiSmallMargin"
                 text="DISCLAIMER: Creation of Advance Shiping Note does not guarantee Gate Entry within plant. Gate Entry clearance will be subject to verification of valid PO &amp; Invoice."
             />
             <ScrollContainer
@@ -124,6 +124,8 @@
                     growing="true"
                     growingThreshold="40"
                     alternateRowColors="true"
+                    itemPress="onItempress"
+                    mode="SingleSelectMaster"
                 >
                     <columns>
                         <Column
@@ -168,6 +170,21 @@
                             />
                         </Column>
                         <Column
+                            id="_IDGenColumn6"
+                            hAlign="Center"
+                            width="8rem"
+                            minScreenWidth="700px"
+                            demandPopin="true"
+                            popinDisplay="Inline"
+                        >
+                            <Label
+                                id="_IDGenLabel6"
+                                design="Bold"
+                                text="Invoice Type"
+                                wrapping="true"
+                            />
+                        </Column>
+                        <Column
                             id="_IDGenColumn4"
                             hAlign="Center"
                             width="6rem"
@@ -193,22 +210,7 @@
                             <Label
                                 id="_IDGenLabel5"
                                 design="Bold"
-                                text="GST"
-                                wrapping="true"
-                            />
-                        </Column>
-                        <Column
-                            id="_IDGenColumn6"
-                            hAlign="Center"
-                            width="8rem"
-                            minScreenWidth="700px"
-                            demandPopin="true"
-                            popinDisplay="Inline"
-                        >
-                            <Label
-                                id="_IDGenLabel6"
-                                design="Bold"
-                                text="Invoice Type"
+                                text="Total GST Amount"
                                 wrapping="true"
                             />
                         </Column>
@@ -313,7 +315,10 @@
                         </Column>
                     </columns>
                     <items>
-                        <ColumnListItem id="uploadTblTemp">
+                        <ColumnListItem
+                            id="uploadTblTemp"
+                            type="Navigation"
+                        >
                             <cells>
                                 <ObjectIdentifier
                                     id="_IDGenObjectIdentifier1"
@@ -330,16 +335,16 @@
                                     text="{createdBy}"
                                 />
                                 <Text
+                                    id="_IDGenText6"
+                                    text="{InvoiceType}"
+                                />
+                                <Text
                                     id="_IDGenText4"
                                     text="{TotalInvoiceAmount}"
                                 />
                                 <Text
                                     id="_IDGenText5"
-                                    text="{GST}"
-                                />
-                                <Text
-                                    id="_IDGenText6"
-                                    text="{InvoiceType}"
+                                    text="{GSTAmt}"
                                 />
                                 <Text
                                     id="_IDGenText10"

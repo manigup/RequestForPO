@@ -14,6 +14,7 @@ sap.ui.define([
         return Controller.extend("com.extension.porequest.controller.Upload", {
 
             onInit: function () {
+                this.router = sap.ui.core.UIComponent.getRouterFor(this);
                 this.tblTemp = this.byId("uploadTblTemp").clone();
                 this.getView().setModel(new JSONModel(), "DataModel");
                 this.getView().setModel(new JSONModel({}), "EditModel");
@@ -44,14 +45,25 @@ sap.ui.define([
                 this.getView().getModel("Filter").setData({});
                 this.getView().getModel("Filter").refresh(true);
             },
+            onItempress: function (oEvent) {
+                var Data = oEvent.getParameter("listItem").getBindingContext().getObject();
 
+                this.router.navTo("ItemDetails", {
+                    "Id": Data.Id,
+                    "Inv_Num": Data.InvoiceNumber
+    
+                });
+    
+            },
             onAddPress: function () {
-                const createFrag = sap.ui.xmlfragment("com.extension.porequest.fragment.Create", this);
+                var that = this;
+                that.router.navTo("InvoiceCreate");
+                /* const createFrag = sap.ui.xmlfragment("com.extension.porequest.fragment.Create", this);
                 this.getView().addDependent(createFrag);
                 this.getView().getModel("DataModel").setData({});
                 this.getView().getModel("DataModel").refresh(true);
                 sap.ui.getCore().byId("attachment").setUploadUrl(this.getView().getModel().sServiceUrl + "/Attachments");
-                createFrag.open();
+                createFrag.open();*/
             },
 
             onInvNoPress: function (evt) {
