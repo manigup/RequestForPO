@@ -133,8 +133,8 @@ sap.ui.define([
             var data = this.getView().getModel("ItemModel").getData();
             try {
                 for (var i = 0; i < data.length; i++) {
-                    data[i].PoList_Id = this.id;
-                    data[i].PoList_InvoiceNumber = this.invNo;
+                    data[i].InvoiceNumber_Id = this.id;
+                    data[i].InvoiceNumber_InvoiceNumber = this.invNo;
                     await this.createPoListItem(data[i]);
                 }
             } catch (error) {

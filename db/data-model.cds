@@ -20,26 +20,26 @@ entity PoList : managed {
       Action             : String(1) default '';
       Status             : String;
       Items              : Composition of many PoListItems
-                             on Items.PoList = $self;
+                             on Items.InvoiceNumber = $self;
 }
 
 entity PoListItems : managed {
-  key UUID      : UUID;
-      MatCode   : String;
-      MatDesc   : String;
-      UOM       : String;
-      Rate      : Decimal;
-      Qty       : Integer;
-      BaseAmt   : Decimal;
-      IGST      : Decimal;
-      IGSTAmt   : Decimal;
-      CGST      : Decimal;
-      CGSTAmt   : Decimal;
-      SGST      : Decimal;
-      SGSTAmt   : Decimal;
-      LineValue : Decimal;
-      HSNCode   : String;
-      PoList    : Association to PoList
+  key UUID          : UUID;
+      MatCode       : String;
+      MatDesc       : String;
+      UOM           : String;
+      Rate          : Decimal;
+      Qty           : Integer;
+      BaseAmt       : Decimal;
+      IGST          : Decimal;
+      IGSTAmt       : Decimal;
+      CGST          : Decimal;
+      CGSTAmt       : Decimal;
+      SGST          : Decimal;
+      SGSTAmt       : Decimal;
+      LineValue     : Decimal;
+      HSNCode       : String;
+  key InvoiceNumber : Association to PoList
 }
 
 entity Attachments : managed {
