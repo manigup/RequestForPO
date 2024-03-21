@@ -114,7 +114,7 @@ sap.ui.define([
                                 BusyIndicator.hide();
                                 MessageBox.success("Invoice " + this.invNo + " updated successfully", {
                                     onClose: () => {
-                                        this.sendEmailNotification("Invoice " + this.invNo + "updated by supplier" + sap.ui.getCore().loginEmail.split("@")[0] + ".");
+                                        this.sendEmailNotification("Invoice " + this.invNo + " updated by supplier " + sap.ui.getCore().loginEmail.split("@")[0] + ".");
                                         this.onNavBack();
                                     }
                                 });
