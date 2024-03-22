@@ -15,6 +15,7 @@ sap.ui.define([
             this.router.attachRouteMatched(this.handleRouteMatched, this);
 
             this.getView().setModel(new JSONModel([]), "AttachmentModel");
+            // this.getView().setModel(new JSONModel([]), "MaterialModel");
 
             this.byId("invCreateTable").setSticky(["ColumnHeaders", "HeaderToolbar"]);
         },
@@ -53,6 +54,24 @@ sap.ui.define([
                 this.getView().setModel(new JSONModel({}), "HeaderModel");
                 this.getView().setModel(new JSONModel([]), "ItemModel");
             }
+
+            // const unitCode = sessionStorage.getItem("unitCode") || "P01";
+            // return new Promise((resolve, reject) => {
+            //     const mParameters = {
+            //         method: "GET",
+            //         urlParameters: {
+            //             UnitCode: unitCode
+            //         },
+            //         success: function (oData) {
+            //             resolve(oData);
+            //             debugger;
+            //         },
+            //         error: function (oError) {
+            //             reject(oError);
+            //         }
+            //     };
+            //     this.getView().getModel().callFunction("/getMaterialList", mParameters);
+            // });
         },
 
         getAttachments: function () {

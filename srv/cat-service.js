@@ -114,6 +114,26 @@ module.exports = cds.service.impl(async function () {
             console.error('Error:', error);
         }
     });
+
+    this.on('getMaterialList', async (req) => {
+        try {
+            const { UnitCode } = req.data,
+                url = "https://imperialauto.co:84/IAIAPI.asmx/GetMaterialList?RequestBy='MA017'&UnitCode='" + UnitCode
+                    + "'&ItemCode=''&ItemDescription='HO",
+                response = await axios({
+                    method: 'get',
+                    url: url,
+                    headers: {
+                        'Authorization': 'Bearer IncMpsaotdlKHYyyfGiVDg==',
+                        'Content-Type': 'application/json'
+                    },
+                    data: {}
+                });
+            return JSON.parse(response.data);
+        } catch (error) {
+            throw new Error(error.message);
+        }
+    });
 });
 
 const _fetchJwtToken = async function (oauthUrl, oauthClient, oauthSecret) {

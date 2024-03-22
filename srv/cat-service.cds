@@ -34,4 +34,5 @@ service CatalogService {
         };
 
     function sendEmail(content : String, toAddress : String) returns String;
+    function getMaterialList(UnitCode : String)              returns String;
 }
