@@ -104,6 +104,9 @@ sap.ui.define([
                     MessageBox.error("Please fill all required inputs to proceed");
                 }
             },
+            onDialogCancel: function (evt) {
+                evt.getSource().getParent().destroy();
+            },
 
             takeAction: function () {
                 setTimeout(() => {
