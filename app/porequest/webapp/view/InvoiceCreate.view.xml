@@ -64,9 +64,8 @@
                 />
                 <Label
                     id="_IDGenLabel3"
-                    required="true"
                     design="Bold"
-                    text="Total Invoice Amount"
+                    text="Total Invoice Amount (inclusive of GST)"
                 />
                 <Input
                     id="invAmmount"
@@ -75,7 +74,6 @@
                 />
                 <Label
                     id="_IDGenLabel4"
-                    required="true"
                     design="Bold"
                     text="Total GST Amount"
                 />
@@ -132,6 +130,34 @@
                     value="{HeaderModel>/Approver}"
                     enabled="false"
                 />
+                <Label
+                    design="Bold"
+                    text="Requestor Name"
+                />
+                <Input
+                    value="{HeaderModel>/RequestorName}"
+                />
+                <Label
+                    design="Bold"
+                    text="Requestor Department"
+                />
+                <Input
+                    value="{HeaderModel>/RequestorDepartment}"
+                />
+                <Label
+                    design="Bold"
+                    text="Requestor Contact No."
+                />
+                <Input
+                    value="{path:'HeaderModel>/RequestorContact',type:'sap.ui.model.type.String',constraints:{minLength: 10,maxLength:10}}"
+                />
+                <Label
+                    design="Bold"
+                    text="Requestor Email ID"
+                />
+                <Input
+                    value="{path:'HeaderModel>/RequestorEmail',type:'.customEMailType'}"
+                />
             </f:content>
         </f:SimpleForm>
         <IconTabBar
@@ -153,7 +179,7 @@
                         <ToolbarSpacer id="_IDGenToolbarSpacer1" />
                         <Button
                             id="_IDGenButton2"
-                            text="Add"
+                            text="Add Item"
                             type="Accept"
                             press="onAddItems"
                             icon="sap-icon://add"
@@ -437,13 +463,13 @@
                             </items>
                         </Table>
                     </ScrollContainer>
-                </IconTabFilter>
+                <!-- </IconTabFilter>
                 <IconTabFilter
                     id="_IDGenIconTabFilter2"
                     text="Attachments"
                     icon="sap-icon://attachment"
                     iconColor="Neutral"
-                >
+                > -->
                     <u:UploadSet
                         id="attachment"
                         mode="None"

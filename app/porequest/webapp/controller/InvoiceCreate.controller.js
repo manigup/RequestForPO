@@ -3,9 +3,10 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "sap/ui/core/BusyIndicator",
     "sap/ui/model/Filter",
-    "sap/m/MessageBox"
+    "sap/m/MessageBox",
+    "sap/ui/model/SimpleType"
 
-], function (Controller, JSONModel, BusyIndicator, Filter, MessageBox) {
+], function (Controller, JSONModel, BusyIndicator, Filter, MessageBox, SimpleType) {
     "use strict";
 
     return Controller.extend("com.extension.porequest.controller.InvoiceCreate", {
@@ -91,8 +92,14 @@ sap.ui.define([
         },
 
         onAddItems: function () {
-            this.getView().getModel("ItemModel").getData().push({});
-            this.getView().getModel("ItemModel").refresh(true);
+            var itemData = this.getView().getModel("ItemModel").getData()
+            if (itemData.length > 0) {
+                MessageBox.error("Cannot add more than one item");
+            }
+            else {
+                this.getView().getModel("ItemModel").getData().push({});
+                this.getView().getModel("ItemModel").refresh(true);
+            }
         },
 
         onCreatePress: function () {
@@ -199,7 +206,8 @@ sap.ui.define([
         },
 
         onAttachItemAdd: function (evt) {
-            evt.getParameter("item").setVisibleEdit(false).setVisibleRemove(false);
+                this.byId("attachment").setUploadEnabled(false);
+                evt.getParameter("item").setVisibleEdit(false).setVisibleRemove(false);
         },
 
         onBeforeUploadStarts: function (evt) {
@@ -309,6 +317,20 @@ sap.ui.define([
             } else {
                 this.router.navTo("Upload");
             }
-        }
+        },
+        customEMailType: SimpleType.extend("email", {
+            formatValue: function (oValue) {
+                return oValue;
+            },
+            parseValue: function (oValue) {
+                return oValue;
+            },
+            validateValue: function (oValue) {
+                var rexMail = /^\w+[\w-+\.]*\@\w+([-\.]\w+)*\.[a-zA-Z]{2,}$/;
+                if (!oValue.match(rexMail)) {
+                    throw new ValidateException("'" + oValue + "' is not a valid e-mail address");
+                }
+            }
+        }),
     });
 });

@@ -3,24 +3,28 @@ namespace db.porequest;
 using managed from '@sap/cds/common';
 
 entity PoList : managed {
-  key Id                 : String(6);
-      InvoiceDate        : String(8);
-  key InvoiceNumber      : String;
-      TotalInvoiceAmount : Integer;
-      InvoiceType        : String;
-      GSTAmt             : Decimal;
-      PONumber           : String;
-      EwayBillNumber     : String default '';
-      EwayBillDate       : String(8) default '';
-      Approver           : String @(restrict: [{
+  key Id                  : String(6);
+      InvoiceDate         : String(8);
+  key InvoiceNumber       : String;
+      TotalInvoiceAmount  : Integer;
+      InvoiceType         : String;
+      GSTAmt              : Decimal;
+      PONumber            : String;
+      EwayBillNumber      : String default '';
+      EwayBillDate        : String(8) default '';
+      Approver            : String @(restrict: [{
         grant: ['WRITE'],
         where: 'CreatedBy = $user'
       }]);
-      ApproverRemarks    : String default '';
-      Action             : String(1) default '';
-      Status             : String;
-      Items              : Composition of many PoListItems
-                             on Items.InvoiceNumber = $self;
+      RequestorName       : String default '';
+      RequestorDepartment : String default '';
+      RequestorContact    : String default '';
+      RequestorEmail      : String default '';
+      ApproverRemarks     : String default '';
+      Action              : String(1) default '';
+      Status              : String;
+      Items               : Composition of many PoListItems
+                              on Items.InvoiceNumber = $self;
 }
 
 entity PoListItems : managed {

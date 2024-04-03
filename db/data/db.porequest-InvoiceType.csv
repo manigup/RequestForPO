@@ -1,6 +1,5 @@
 Id;Type;ApproverEmail;ApproverName
 1;Domestic Material Purchase;rajeshsehgal@impauto.com;Rajesh Sehgal
 2;Import Material Purchase;sudhir@impauto.com;Sudhir
-3;Domestic Service Procurement;manishgupta8@kpmg.com;Manish Gupta
-4;Freight Bill;samarnahak@kpmg.com;Samar Nahak
-5;Capex Invoice;manikandand@kpmg.com;Manikandan
+3;Other Domestic Service Procurement;manishgupta8@kpmg.com;Manish Gupta
+4;Freight Services;samarnahak@kpmg.com;Samar Nahak
