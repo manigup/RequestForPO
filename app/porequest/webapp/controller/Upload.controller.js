@@ -67,6 +67,7 @@ sap.ui.define([
                 const source = evt.getSource(),
                     obj = source.getBindingContext().getObject(),
                     selectedAction = source.getSelectedKey();
+                this.actionEvt = evt.getSource(); 
                 MessageBox.confirm("Are you sure ?", {
                     onClose: (action) => {
                         if (action === "YES") {
@@ -105,6 +106,7 @@ sap.ui.define([
                 }
             },
             onDialogCancel: function (evt) {
+                this.actionEvt.setSelectedKey();
                 evt.getSource().getParent().destroy();
             },
 
