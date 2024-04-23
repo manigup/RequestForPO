@@ -103,45 +103,87 @@ module.exports = cds.service.impl(async function () {
             CreatedBy: "Manikandan"
         };
         try {
-            await axios.post('https://imperialauto.co:84/IAIAPI.asmx/SendMail', payload, {
-                headers: {
-                    'Authorization': 'Bearer IncMpsaotdlKHYyyfGiVDg==',
-                    'Content-Type': 'application/json'
-                }
-            });
-            return `Email sent successfully.`;
+            const legApi = await cds.connect.to('Legacy'),
+                response = await legApi.send({
+                    query: `POST SendMail`,
+                    headers: {
+                        'Authorization': 'Bearer IncMpsaotdlKHYyyfGiVDg==',
+                        'Content-Type': 'application/json'
+                    },
+                    data: payload
+                });
+            if (response.ErrorCode) {
+                return "Error sending email";
+            } else {
+                return "Email sent successfully";
+            }
         } catch (error) {
             console.error('Error:', error);
         }
     });
 
     this.on('getMaterialList', async (req) => {
-        const {UnitCode, ItemCode, ItemDescription} = req.data;
-        return getMaterialList(UnitCode, ItemCode, ItemDescription)
+        const { UnitCode, ItemCode, ItemDescription } = req.data;
+        if (req.user.id === "anonymous") {
+            req.user.id = "samarnahak@kpmg.com";
+        }
+        return fetchMaterialList(UnitCode, ItemCode, ItemDescription, req.user.id)
+    });
+
+    this.on('getPoList', async (req) => {
+        const { unitCode, addressCode } = req.data;
+        if (req.user.id === "anonymous") {
+            req.user.id = "samarnahak@kpmg.com";
+        }
+        return fetchPoList(unitCode, addressCode, req.user.id)
     });
 });
 
-async function getMaterialList(UnitCode, ItemCode, ItemDescription){
+async function fetchPoList(unitCode, addressCode, userId) {
     try {
-        const response = await axios({
-            method: 'get',
-            url: `https://imperialauto.co:84/IAIAPI.asmx/GetMaterialList?RequestBy='MA017'&UnitCode='${UnitCode}'&ItemCode='${ItemCode}'&ItemDescription='${ItemDescription}'`,
-            headers: {
-                'Authorization': 'Bearer ibeMppBlZOk=',
-                'Content-Type': 'application/json'
-            },
-            data: {}
-        });
+        const token = await generateToken(userId),
+            legApi = await cds.connect.to('Legacy'),
+            response = await legApi.send({
+                query: `GET GetPOPSList?RequestBy='${userId}'&UnitCode='${unitCode}'&AddressCode='${addressCode}'`,
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+            });
 
-        if (response.data && response.data.d) {
-            return JSON.parse(response.data.d);
+        if (response.d) {
+            return JSON.parse(response.d);
+        } else {
+            console.error('Error parsing response:', response.data);
+            throw new Error('Error parsing the response from the API.');
+        }
+    } catch (error) {
+        console.error('Error in GetPOPSList API call:', error);
+        throw new Error('Unable to fetch PO List:', error);
+    }
+}
+
+async function fetchMaterialList(UnitCode, ItemCode, ItemDescription, userId) {
+    try {
+        const token = await generateToken(userId),
+            legApi = await cds.connect.to('Legacy'),
+            response = await legApi.send({
+                query: `GET GetMaterialList?RequestBy='${userId}'&UnitCode='${UnitCode}'&ItemCode='${ItemCode}'&ItemDescription='${ItemDescription}'`,
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+            });
+
+        if (response.d) {
+            return JSON.parse(response.d);
         } else {
             console.error('Error parsing response:', response.data);
             throw new Error('Error parsing the response from the API.');
         }
     } catch (error) {
         console.error('Error in getMaterialList API call:', error);
-        throw new Error('Unable to fetch Material List.');
+        throw new Error('Unable to fetch Material List:', error);
     }
 }
 
@@ -223,5 +265,30 @@ const _uploadAttachment = async function (sdmUrl, jwtToken, repositoryId, folder
                 reject(error)
             })
     })
+}
+
+async function generateToken(username) {
+    try {
+        const legApi = await cds.connect.to('Legacy'),
+            response = await legApi.send({
+                query: `POST GenerateToken`,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                data: {
+                    "InputKey": username
+                }
+            });
+
+        if (response.d) {
+            return response.d;
+        } else {
+            console.error('Error parsing token response:', response.data);
+            throw new Error('Error parsing the token response from the API.');
+        }
+    } catch (error) {
+        console.error('Error generating token:', error);
+        throw new Error('Unable to generate token.');
+    }
 }
 

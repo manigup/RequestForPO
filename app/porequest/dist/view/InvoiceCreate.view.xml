@@ -64,9 +64,8 @@
                 />
                 <Label
                     id="_IDGenLabel3"
-                    required="true"
                     design="Bold"
-                    text="Total Invoice Amount"
+                    text="Total Invoice Amount (inclusive of GST)"
                 />
                 <Input
                     id="invAmmount"
@@ -75,7 +74,6 @@
                 />
                 <Label
                     id="_IDGenLabel4"
-                    required="true"
                     design="Bold"
                     text="Total GST Amount"
                 />
@@ -132,6 +130,48 @@
                     value="{HeaderModel>/Approver}"
                     enabled="false"
                 />
+                <Label
+                    id="_IDGenLabel111"
+                    required="true"
+                    design="Bold"
+                    text="Requestor Name"
+                />
+                <Input
+                    id="reqname"
+                    value="{HeaderModel>/RequestorName}"
+                />
+                <Label
+                    id="_IDGenLabel120"
+                    required="true"
+                    design="Bold"
+                    text="Requestor Department"
+                />
+                <Input
+                    id="reqdep"
+                    value="{HeaderModel>/RequestorDepartment}"
+                />
+                <Label
+                    id="_IDGenLabel130"
+                    required="true"
+                    design="Bold"
+                    text="Requestor Contact No."
+                />
+                <Input
+                    id="reqcon"
+                    type="Number"
+                    value="{path:'HeaderModel>/RequestorContact',type:'sap.ui.model.type.String',constraints:{minLength: 10,maxLength:10}}"
+                />
+                <Label
+                    id="_IDGenLabel14"
+                    required="true"
+                    design="Bold"
+                    text="Requestor Email ID"
+                />
+                <Input
+                    id="reqemail"
+                    type="Email"
+                    value="{path:'HeaderModel>/RequestorEmail',type:'.customEMailType'}"
+                />
             </f:content>
         </f:SimpleForm>
         <IconTabBar
@@ -153,7 +193,7 @@
                         <ToolbarSpacer id="_IDGenToolbarSpacer1" />
                         <Button
                             id="_IDGenButton2"
-                            text="Add"
+                            text="Add Item"
                             type="Accept"
                             press="onAddItems"
                             icon="sap-icon://add"
@@ -175,7 +215,7 @@
                                 <Column
                                     id="_IDGenColumn1"
                                     minScreenWidth="Tablet"
-                                    width="5rem"
+                                    width="8rem"
                                     hAlign="Center"
                                 >
                                     <Text
@@ -186,12 +226,23 @@
                                 <Column
                                     id="_IDGenColumn2"
                                     minScreenWidth="Tablet"
-                                    width="5rem"
+                                    width="12rem"
                                     hAlign="Center"
                                 >
                                     <Text
                                         id="_IDGenText2"
                                         text="Material Description"
+                                    />
+                                </Column>
+                                <Column
+                                    id="_IDGenColumn14"
+                                    minScreenWidth="Tablet"
+                                    width="5rem"
+                                    hAlign="Center"
+                                >
+                                    <Text
+                                        id="_IDGenText15"
+                                        text="Material Group"
                                     />
                                 </Column>
                                 <Column
@@ -212,7 +263,7 @@
                                     id="_IDGenColumn110"
                                     minScreenWidth="Tablet"
                                     demandPopin="true"
-                                    width="4rem"
+                                    width="6rem"
                                     hAlign="Center"
                                 >
                                     <Label
@@ -369,18 +420,29 @@
                                         <Input
                                             id="_IDGenInput1"
                                             value="{ItemModel>MatCode}"
+                                            change="onMatChange"
                                         />
                                         <Input
-                                            id="_IDGenInput2"
+                                            id="matId"
                                             value="{ItemModel>MatDesc}"
+                                            enabled="false"
+                                        />
+                                        <!-- showValueHelp="true"
+                                            valueHelpRequest="onMatF4Help" -->
+                                        <Input
+                                            id="_IDGenInput14"
+                                            value="{ItemModel>MatGroup}"
+                                            enabled="false"
                                         />
                                         <Input
                                             id="_IDGenInput3"
                                             value="{ItemModel>UOM}"
+                                            enabled="false"
                                         />
                                         <Input
                                             id="_IDGenInput13"
                                             value="{ItemModel>HSNCode}"
+                                            enabled="false"
                                         />
                                         <Input
                                             id="_IDGenInput4"
@@ -447,14 +509,13 @@
                     <u:UploadSet
                         id="attachment"
                         mode="None"
-                        showIcons="false"
+                        showIcons="true"
                         fileTypes="pdf,xlsx,doc,png,jpeg"
                         multiple="true"
                         instantUpload="false"
                         maxFileSize="10"
                         uploadCompleted="onUploadComplete"
                         beforeUploadStarts="onBeforeUploadStarts"
-                        uploadButtonInvisible="false"
                         afterItemAdded="onAttachItemAdd"
                         items="{AttachmentModel>/}"
                     >

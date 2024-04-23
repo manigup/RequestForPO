@@ -131,6 +131,7 @@
                     enabled="false"
                 />
                 <Label
+                    id="_IDGenLabel111"
                     required="true"
                     design="Bold"
                     text="Requestor Name"
@@ -140,6 +141,7 @@
                     value="{HeaderModel>/RequestorName}"
                 />
                 <Label
+                    id="_IDGenLabel120"
                     required="true"
                     design="Bold"
                     text="Requestor Department"
@@ -149,21 +151,25 @@
                     value="{HeaderModel>/RequestorDepartment}"
                 />
                 <Label
+                    id="_IDGenLabel130"
                     required="true"
                     design="Bold"
                     text="Requestor Contact No."
                 />
                 <Input
                     id="reqcon"
+                    type="Number"
                     value="{path:'HeaderModel>/RequestorContact',type:'sap.ui.model.type.String',constraints:{minLength: 10,maxLength:10}}"
                 />
                 <Label
+                    id="_IDGenLabel14"
                     required="true"
                     design="Bold"
                     text="Requestor Email ID"
                 />
                 <Input
                     id="reqemail"
+                    type="Email"
                     value="{path:'HeaderModel>/RequestorEmail',type:'.customEMailType'}"
                 />
             </f:content>
@@ -493,24 +499,23 @@
                             </items>
                         </Table>
                     </ScrollContainer>
-                <!-- </IconTabFilter>
+                </IconTabFilter>
                 <IconTabFilter
                     id="_IDGenIconTabFilter2"
                     text="Attachments"
                     icon="sap-icon://attachment"
                     iconColor="Neutral"
-                > -->
+                >
                     <u:UploadSet
                         id="attachment"
                         mode="None"
-                        showIcons="false"
+                        showIcons="true"
                         fileTypes="pdf,xlsx,doc,png,jpeg"
                         multiple="true"
                         instantUpload="false"
                         maxFileSize="10"
                         uploadCompleted="onUploadComplete"
                         beforeUploadStarts="onBeforeUploadStarts"
-                        uploadButtonInvisible="false"
                         afterItemAdded="onAttachItemAdd"
                         items="{AttachmentModel>/}"
                     >

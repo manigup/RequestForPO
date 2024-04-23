@@ -3,9 +3,10 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "sap/ui/core/BusyIndicator",
     "sap/ui/model/Filter",
-    "sap/m/MessageBox"
+    "sap/m/MessageBox",
+    "sap/ui/model/SimpleType"
 
-], function (Controller, JSONModel, BusyIndicator, Filter, MessageBox) {
+], function (Controller, JSONModel, BusyIndicator, Filter, MessageBox, SimpleType) {
     "use strict";
 
     return Controller.extend("com.extension.porequest.controller.InvoiceCreate", {
@@ -24,6 +25,7 @@ sap.ui.define([
             if (evt.getParameter("name") !== "InvoiceCreate") {
                 return;
             }
+            this.byId("attachment").setUploadEnabled(true).removeAllItems();
             this.byId("attachment").setUploadUrl(this.getView().getModel().sServiceUrl + "/Attachments");
 
             this.id = evt.getParameter("arguments").Id;
@@ -74,6 +76,37 @@ sap.ui.define([
             // });
         },
 
+        onMatChange: function (evt) {
+            this.unitCode = sessionStorage.getItem("unitCode") || "P01";
+            var matCode = evt.getParameter("value");
+            this.sPath = evt.getSource().getParent().getBindingContextPath().split("/")[1];
+            var oModel = this.getOwnerComponent().getModel();
+            return new Promise(function (resolve, reject) {
+                oModel.callFunction("/getMaterialList", {
+                    method: "GET",
+                    urlParameters: {
+                        UnitCode: this.unitCode,
+                        ItemCode: matCode,
+                        ItemDescription: ""
+                    },
+                    success: function (oData, response) {
+                        var data = this.getView().getModel("ItemModel").getData()[this.sPath];
+                        data.MatDesc = oData.results[0].MaterialDescription;
+                        data.UOM = oData.results[0].UOM;
+                        data.HSNCode = oData.results[0].HSNCode;
+                        data.MatGroup = oData.results[0].MaterialGroup;
+                        this.getView().getModel("ItemModel").refresh(true);
+                        resolve();
+                    }.bind(this),
+                    error: function (oError) {
+                        reject(oError);
+                    }
+                });
+            }.bind(this));
+
+        },
+
+
         getAttachments: function () {
             this.getView().getModel().read("/Attachments", {
                 filters: [new Filter("Id", "EQ", this.id)],
@@ -91,12 +124,18 @@ sap.ui.define([
         },
 
         onAddItems: function () {
-            this.getView().getModel("ItemModel").getData().push({});
-            this.getView().getModel("ItemModel").refresh(true);
+            var itemData = this.getView().getModel("ItemModel").getData()
+            if (itemData.length > 0) {
+                MessageBox.error("Cannot add more than one item");
+            }
+            else {
+                this.getView().getModel("ItemModel").getData().push({});
+                this.getView().getModel("ItemModel").refresh(true);
+            }
         },
 
         onCreatePress: function () {
-            if (this.validateReqFields(["invDate", "invNo", "invAmmount", "gst", "invType"]) && this.byId("attachment").getIncompleteItems().length > 0) {
+            if (this.validateReqFields(["invDate", "invNo", "invAmmount", "gst", "invType", "reqname", "reqdep", "reqcon", "reqemail"]) && this.byId("attachment").getIncompleteItems().length > 0) {
                 BusyIndicator.show();
                 const payload = this.getView().getModel("HeaderModel").getData();
                 setTimeout(() => {
@@ -199,6 +238,7 @@ sap.ui.define([
         },
 
         onAttachItemAdd: function (evt) {
+            this.byId("attachment").setUploadEnabled(false);
             evt.getParameter("item").setVisibleEdit(false).setVisibleRemove(false);
         },
 
@@ -309,6 +349,20 @@ sap.ui.define([
             } else {
                 this.router.navTo("Upload");
             }
-        }
+        },
+        customEMailType: SimpleType.extend("email", {
+            formatValue: function (oValue) {
+                return oValue;
+            },
+            parseValue: function (oValue) {
+                return oValue;
+            },
+            validateValue: function (oValue) {
+                var rexMail = /^\w+[\w-+\.]*\@\w+([-\.]\w+)*\.[a-zA-Z]{2,}$/;
+                if (!oValue.match(rexMail)) {
+                    throw new ValidateException("'" + oValue + "' is not a valid e-mail address");
+                }
+            }
+        }),
     });
 });

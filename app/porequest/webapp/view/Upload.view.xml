@@ -10,7 +10,7 @@
         title="List"
         titleAlignment="Center"
     >
-        <Bar>
+        <Bar id="_IDGenBar1">
             <contentMiddle>
                 <Button
                     id="_IDGenButton1"
@@ -26,7 +26,7 @@
         <content>
             <fb:FilterBar
                 id="_IDGenFilterBar1"
-                header="Filters"
+                header="Apply Filters"
                 useToolbar="true"
                 showFilterConfiguration="false"
                 search="getData"

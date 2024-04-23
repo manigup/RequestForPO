@@ -10,20 +10,24 @@
         title="List"
         titleAlignment="Center"
     >
-        <headerContent>
-            <Button
-                id="_IDGenButton1"
-                type="Emphasized"
-                text="Add"
-                icon="sap-icon://add"
-                press="onAddPress"
-                visible="{path:'',formatter:'formatter.addBtnVisible'}"
-            />
-        </headerContent>
+        <Bar id="_IDGenBar1">
+            <contentMiddle>
+                <Button
+                    id="_IDGenButton1"
+                    type="Emphasized"
+                    text="Raise Request for PO / Schedule"
+                    icon="sap-icon://add"
+                    iconFirst="false"
+                    press="onAddPress"
+                    visible="{path:'',formatter:'formatter.addBtnVisible'}"
+                />
+            </contentMiddle>
+        </Bar>
         <content>
             <fb:FilterBar
                 id="_IDGenFilterBar1"
-                useToolbar="false"
+                header="Apply Filters"
+                useToolbar="true"
                 showFilterConfiguration="false"
                 search="getData"
                 showClearOnFB="true"
@@ -110,7 +114,7 @@
                 id="_IDGenMessageStrip1"
                 type="Information"
                 class="sapUiSmallMargin"
-                text="DISCLAIMER: Creation of Advance Shiping Note does not guarantee Gate Entry within plant. Gate Entry clearance will be subject to verification of valid PO &amp; Invoice."
+                text="DISCLAIMER: Raising a request for PO/Schedule does not guarantee Gate Entry within plant. Gate Entry clearance will be subject to verification of valid PO, Schedule &amp; Invoice."
             />
             <ScrollContainer
                 id="_IDGenScrollContainer1"

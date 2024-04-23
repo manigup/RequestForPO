@@ -1,0 +1,8 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+	<SelectDialog id="matF4Id" title="Material" noDataText="No Material Found" search="matHelpSearch"
+		confirm="onMaterialConfirm">
+		<items>
+			<StandardListItem id="matTempId" title="{MaterialCode}" description="{MaterialDescription}"/>
+		</items>
+	</SelectDialog>
+</core:FragmentDefinition>

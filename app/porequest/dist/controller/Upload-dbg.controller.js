@@ -17,6 +17,10 @@ sap.ui.define([
                 this.router = sap.ui.core.UIComponent.getRouterFor(this);
                 this.tblTemp = this.byId("uploadTblTemp").clone();
                 this.getView().setModel(new JSONModel({}), "Filter");
+                this.getView().setModel(new JSONModel([]), "PoList");
+
+                this.unitCode = sessionStorage.getItem("unitCode") || "P05";
+                this.addressCode = sessionStorage.getItem("AddressCode") || 'GPL-01-01';
             },
 
             onAfterRendering: function () {
@@ -67,6 +71,7 @@ sap.ui.define([
                 const source = evt.getSource(),
                     obj = source.getBindingContext().getObject(),
                     selectedAction = source.getSelectedKey();
+                this.actionEvt = evt.getSource();
                 MessageBox.confirm("Are you sure ?", {
                     onClose: (action) => {
                         if (action === "YES") {
@@ -75,16 +80,38 @@ sap.ui.define([
                             this.toAddress = obj.createdBy;
                             this.payload = { Action: selectedAction };
 
-                            const remarksFrag = sap.ui.xmlfragment("com.extension.porequest.fragment.Remarks", this);
-                            this.getView().addDependent(remarksFrag);
-                            const title = selectedAction === "A" ? "Approval" : "Rejection";
                             if (selectedAction === "A") {
                                 sap.ui.getCore().byId("po").setVisible(true);
+
+                                // return new Promise(function (resolve, reject) {
+                                //     this.getView().getModel().callFunction("/getPoList", {
+                                //         method: "GET",
+                                //         urlParameters: {
+                                //             unitCode: this.unitCode,
+                                //             addressCode: this.addressCode
+                                //         },
+                                //         success: function (oData, response) {
+                                //             this.getView().getModel("PoList").setData(oData.results);
+                                //             this.getView().getModel("PoList").refresh(true);
+
+                                const remarksFrag = sap.ui.xmlfragment("com.extension.porequest.fragment.Remarks", this);
+                                this.getView().addDependent(remarksFrag);
+                                const title = selectedAction === "A" ? "Approval" : "Rejection";
+
+                                remarksFrag.setTitle(title);
+                                remarksFrag.open();
+
+                                resolve();
+
+                                //         }.bind(this),
+                                //         error: function (oError) {
+                                //             reject(oError);
+                                //         }
+                                //     });
+                                // }.bind(this));
                             } else {
                                 sap.ui.getCore().byId("po").setVisible(false);
                             }
-                            remarksFrag.setTitle(title);
-                            remarksFrag.open();
                         }
                     },
                     actions: ["YES", "NO"],
@@ -103,6 +130,10 @@ sap.ui.define([
                 } else {
                     MessageBox.error("Please fill all required inputs to proceed");
                 }
+            },
+            onDialogCancel: function (evt) {
+                this.actionEvt.setSelectedKey();
+                evt.getSource().getParent().destroy();
             },
 
             takeAction: function () {

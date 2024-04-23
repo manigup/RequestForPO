@@ -25,6 +25,7 @@ sap.ui.define([
             if (evt.getParameter("name") !== "InvoiceCreate") {
                 return;
             }
+            this.byId("attachment").setUploadEnabled(true).removeAllItems();
             this.byId("attachment").setUploadUrl(this.getView().getModel().sServiceUrl + "/Attachments");
 
             this.id = evt.getParameter("arguments").Id;
