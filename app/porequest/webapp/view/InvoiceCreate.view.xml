@@ -131,31 +131,39 @@
                     enabled="false"
                 />
                 <Label
+                    required="true"
                     design="Bold"
                     text="Requestor Name"
                 />
                 <Input
+                    id="reqname"
                     value="{HeaderModel>/RequestorName}"
                 />
                 <Label
+                    required="true"
                     design="Bold"
                     text="Requestor Department"
                 />
                 <Input
+                    id="reqdep"
                     value="{HeaderModel>/RequestorDepartment}"
                 />
                 <Label
+                    required="true"
                     design="Bold"
                     text="Requestor Contact No."
                 />
                 <Input
+                    id="reqcon"
                     value="{path:'HeaderModel>/RequestorContact',type:'sap.ui.model.type.String',constraints:{minLength: 10,maxLength:10}}"
                 />
                 <Label
+                    required="true"
                     design="Bold"
                     text="Requestor Email ID"
                 />
                 <Input
+                    id="reqemail"
                     value="{path:'HeaderModel>/RequestorEmail',type:'.customEMailType'}"
                 />
             </f:content>
@@ -201,7 +209,7 @@
                                 <Column
                                     id="_IDGenColumn1"
                                     minScreenWidth="Tablet"
-                                    width="5rem"
+                                    width="8rem"
                                     hAlign="Center"
                                 >
                                     <Text
@@ -212,12 +220,23 @@
                                 <Column
                                     id="_IDGenColumn2"
                                     minScreenWidth="Tablet"
-                                    width="5rem"
+                                    width="12rem"
                                     hAlign="Center"
                                 >
                                     <Text
                                         id="_IDGenText2"
                                         text="Material Description"
+                                    />
+                                </Column>
+                                <Column
+                                    id="_IDGenColumn14"
+                                    minScreenWidth="Tablet"
+                                    width="5rem"
+                                    hAlign="Center"
+                                >
+                                    <Text
+                                        id="_IDGenText15"
+                                        text="Material Group"
                                     />
                                 </Column>
                                 <Column
@@ -238,7 +257,7 @@
                                     id="_IDGenColumn110"
                                     minScreenWidth="Tablet"
                                     demandPopin="true"
-                                    width="4rem"
+                                    width="6rem"
                                     hAlign="Center"
                                 >
                                     <Label
@@ -395,18 +414,29 @@
                                         <Input
                                             id="_IDGenInput1"
                                             value="{ItemModel>MatCode}"
+                                            change="onMatChange"
                                         />
                                         <Input
-                                            id="_IDGenInput2"
+                                            id="matId"
                                             value="{ItemModel>MatDesc}"
+                                            enabled="false"
+                                        />
+                                        <!-- showValueHelp="true"
+                                            valueHelpRequest="onMatF4Help" -->
+                                        <Input
+                                            id="_IDGenInput14"
+                                            value="{ItemModel>MatGroup}"
+                                            enabled="false"
                                         />
                                         <Input
                                             id="_IDGenInput3"
                                             value="{ItemModel>UOM}"
+                                            enabled="false"
                                         />
                                         <Input
                                             id="_IDGenInput13"
                                             value="{ItemModel>HSNCode}"
+                                            enabled="false"
                                         />
                                         <Input
                                             id="_IDGenInput4"

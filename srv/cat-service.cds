@@ -1,5 +1,15 @@
 using db.porequest as my from '../db/data-model';
 
+type MaterialList {
+    UnitCode: String;
+    MaterialCode: String;
+    MaterialDescription: String;
+    MaterialNumber: String;
+    UOM: String;
+    HSNCode: String;
+    MaterialGroup: String;
+}
+
 service CatalogService {
 
     entity PoList      as
@@ -34,5 +44,6 @@ service CatalogService {
         };
 
     function sendEmail(content : String, toAddress : String) returns String;
-    function getMaterialList(UnitCode : String)              returns String;
+    function getMaterialList(UnitCode : String, ItemCode: String, ItemDescription: String) returns array of MaterialList;
+
 }

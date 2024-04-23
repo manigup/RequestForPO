@@ -116,25 +116,34 @@ module.exports = cds.service.impl(async function () {
     });
 
     this.on('getMaterialList', async (req) => {
-        try {
-            const { UnitCode } = req.data,
-                url = "https://imperialauto.co:84/IAIAPI.asmx/GetMaterialList?RequestBy='MA017'&UnitCode='" + UnitCode
-                    + "'&ItemCode=''&ItemDescription='HO",
-                response = await axios({
-                    method: 'get',
-                    url: url,
-                    headers: {
-                        'Authorization': 'Bearer IncMpsaotdlKHYyyfGiVDg==',
-                        'Content-Type': 'application/json'
-                    },
-                    data: {}
-                });
-            return JSON.parse(response.data);
-        } catch (error) {
-            throw new Error(error.message);
-        }
+        const {UnitCode, ItemCode, ItemDescription} = req.data;
+        return getMaterialList(UnitCode, ItemCode, ItemDescription)
     });
 });
+
+async function getMaterialList(UnitCode, ItemCode, ItemDescription){
+    try {
+        const response = await axios({
+            method: 'get',
+            url: `https://imperialauto.co:84/IAIAPI.asmx/GetMaterialList?RequestBy='MA017'&UnitCode='${UnitCode}'&ItemCode='${ItemCode}'&ItemDescription='${ItemDescription}'`,
+            headers: {
+                'Authorization': 'Bearer ibeMppBlZOk=',
+                'Content-Type': 'application/json'
+            },
+            data: {}
+        });
+
+        if (response.data && response.data.d) {
+            return JSON.parse(response.data.d);
+        } else {
+            console.error('Error parsing response:', response.data);
+            throw new Error('Error parsing the response from the API.');
+        }
+    } catch (error) {
+        console.error('Error in getMaterialList API call:', error);
+        throw new Error('Unable to fetch Material List.');
+    }
+}
 
 const _fetchJwtToken = async function (oauthUrl, oauthClient, oauthSecret) {
 

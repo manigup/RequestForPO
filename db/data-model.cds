@@ -32,6 +32,7 @@ entity PoListItems : managed {
       MatCode       : String;
       MatDesc       : String;
       UOM           : String;
+      MatGroup      : String;
       Rate          : Decimal;
       Qty           : Integer;
       BaseAmt       : Decimal;

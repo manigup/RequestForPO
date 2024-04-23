@@ -75,6 +75,37 @@ sap.ui.define([
             // });
         },
 
+        onMatChange: function (evt) {
+            this.unitCode = sessionStorage.getItem("unitCode") || "P01";
+            var matCode = evt.getParameter("value");
+            this.sPath = evt.getSource().getParent().getBindingContextPath().split("/")[1];
+            var oModel = this.getOwnerComponent().getModel();
+            return new Promise(function (resolve, reject) {
+                oModel.callFunction("/getMaterialList", {
+                    method: "GET",
+                    urlParameters: {
+                        UnitCode: this.unitCode,
+                        ItemCode: matCode,
+                        ItemDescription: ""
+                    },
+                    success: function (oData, response) {
+                        var data = this.getView().getModel("ItemModel").getData()[this.sPath];
+                        data.MatDesc = oData.results[0].MaterialDescription;
+                        data.UOM = oData.results[0].UOM;
+                        data.HSNCode = oData.results[0].HSNCode;
+                        data.MatGroup = oData.results[0].MaterialGroup;
+                        this.getView().getModel("ItemModel").refresh(true);
+                        resolve();
+                    }.bind(this),
+                    error: function (oError) {
+                        reject(oError);
+                    }
+                });
+            }.bind(this));
+
+        },
+
+
         getAttachments: function () {
             this.getView().getModel().read("/Attachments", {
                 filters: [new Filter("Id", "EQ", this.id)],
@@ -103,7 +134,7 @@ sap.ui.define([
         },
 
         onCreatePress: function () {
-            if (this.validateReqFields(["invDate", "invNo", "invAmmount", "gst", "invType"]) && this.byId("attachment").getIncompleteItems().length > 0) {
+            if (this.validateReqFields(["invDate", "invNo", "invAmmount", "gst", "invType", "reqname", "reqdep", "reqcon", "reqemail"]) && this.byId("attachment").getIncompleteItems().length > 0) {
                 BusyIndicator.show();
                 const payload = this.getView().getModel("HeaderModel").getData();
                 setTimeout(() => {
@@ -206,8 +237,8 @@ sap.ui.define([
         },
 
         onAttachItemAdd: function (evt) {
-                this.byId("attachment").setUploadEnabled(false);
-                evt.getParameter("item").setVisibleEdit(false).setVisibleRemove(false);
+            this.byId("attachment").setUploadEnabled(false);
+            evt.getParameter("item").setVisibleEdit(false).setVisibleRemove(false);
         },
 
         onBeforeUploadStarts: function (evt) {
