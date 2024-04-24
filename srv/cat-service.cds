@@ -10,7 +10,7 @@ type MaterialList {
     MaterialGroup       : String;
 }
 
-type PoList {
+type PoF4List {
     UnitCode           : String;
     AddressCode        : String;
     AddressDescription : String;
@@ -59,6 +59,6 @@ service CatalogService {
 
     function sendEmail(content : String, toAddress : String)                                 returns String;
     function getMaterialList(UnitCode : String, ItemCode : String, ItemDescription : String) returns array of MaterialList;
-    function getPoList(unitCode : String, addressCode : String)                              returns array of PoList;
+    function getPoList(unitCode : String, addressCode : String)                              returns array of PoF4List;
 
 }

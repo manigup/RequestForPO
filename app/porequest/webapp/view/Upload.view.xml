@@ -10,24 +10,21 @@
         title="List"
         titleAlignment="Center"
     >
-        <Bar id="_IDGenBar1">
-            <contentMiddle>
-                <Button
-                    id="_IDGenButton1"
-                    type="Emphasized"
-                    text="Raise Request for PO / Schedule"
-                    icon="sap-icon://add"
-                    iconFirst="false"
-                    press="onAddPress"
-                    visible="{path:'',formatter:'formatter.addBtnVisible'}"
-                />
-            </contentMiddle>
-        </Bar>
+        <headerContent>
+            <Button
+                id="_IDGenButton1"
+                type="Emphasized"
+                text="Raise Request for PO/Schedule"
+                icon="sap-icon://add"
+                iconFirst="false"
+                press="onAddPress"
+                visible="{path:'',formatter:'formatter.addBtnVisible'}"
+            />
+        </headerContent>
         <content>
             <fb:FilterBar
                 id="_IDGenFilterBar1"
-                header="Apply Filters"
-                useToolbar="true"
+                useToolbar="false"
                 showFilterConfiguration="false"
                 search="getData"
                 showClearOnFB="true"

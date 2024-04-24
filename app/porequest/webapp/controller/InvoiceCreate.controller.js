@@ -16,7 +16,7 @@ sap.ui.define([
             this.router.attachRouteMatched(this.handleRouteMatched, this);
 
             this.getView().setModel(new JSONModel([]), "AttachmentModel");
-            // this.getView().setModel(new JSONModel([]), "MaterialModel");
+            this.getView().setModel(new JSONModel(sessionStorage.getItem("CodeDetails") || [{ "code": "P39" }]), "CodeDetails");
 
             this.byId("invCreateTable").setSticky(["ColumnHeaders", "HeaderToolbar"]);
         },
@@ -135,7 +135,7 @@ sap.ui.define([
         },
 
         onCreatePress: function () {
-            if (this.validateReqFields(["invDate", "invNo", "invAmmount", "gst", "invType", "reqname", "reqdep", "reqcon", "reqemail"]) && this.byId("attachment").getIncompleteItems().length > 0) {
+            if (this.validateReqFields(["invDate", "invNo", "invAmmount", "gst", "invType", "reqname", "reqdep", "reqcon", "reqemail", "pCode"]) && this.byId("attachment").getIncompleteItems().length > 0) {
                 BusyIndicator.show();
                 const payload = this.getView().getModel("HeaderModel").getData();
                 setTimeout(() => {
@@ -157,7 +157,7 @@ sap.ui.define([
 
         onEditPress: function (evt) {
             this.dialogSource = evt.getSource();
-            if (this.validateReqFields(["invDate", "invNo", "invAmmount", "gst", "invType"])) {
+            if (this.validateReqFields(["invDate", "invNo", "invAmmount", "gst", "invType", "reqname", "reqdep", "reqcon", "reqemail", "pCode"])) {
                 BusyIndicator.show();
                 const payload = this.getView().getModel("HeaderModel").getData();
                 payload.Action = "E";

@@ -127,7 +127,25 @@ module.exports = cds.service.impl(async function () {
         if (req.user.id === "anonymous") {
             req.user.id = "samarnahak@kpmg.com";
         }
-        return fetchMaterialList(UnitCode, ItemCode, ItemDescription, req.user.id)
+        try {
+            const token = await generateToken(req.user.id),
+                legApi = await cds.connect.to('Legacy'),
+                response = await legApi.send({
+                    query: `GET GetMaterialList?RequestBy='${req.user.id}'&UnitCode='${UnitCode}'&ItemCode='${ItemCode}'&ItemDescription='${ItemDescription}'`,
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                });
+
+            if (response.d) {
+                return JSON.parse(response.d);
+            } else {
+                req.reject(500, `Error parsing response: ${response.data}`);
+            }
+        } catch (error) {
+            req.reject(500, "Unable to fetch Material List");
+        }
     });
 
     this.on('getPoList', async (req) => {
@@ -135,57 +153,27 @@ module.exports = cds.service.impl(async function () {
         if (req.user.id === "anonymous") {
             req.user.id = "samarnahak@kpmg.com";
         }
-        return fetchPoList(unitCode, addressCode, req.user.id)
+        try {
+            const token = await generateToken(req.user.id),
+                legApi = await cds.connect.to('Legacy'),
+                response = await legApi.send({
+                    query: `GET GetPOPSList?RequestBy='${req.user.id}'&UnitCode='${unitCode}'&AddressCode='${addressCode}'`,
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                });
+
+            if (response.d) {
+                return JSON.parse(response.d);
+            } else {
+                req.reject(500, `Error parsing response: ${response.data}`);
+            }
+        } catch (error) {
+            req.reject(500, "Unable to fetch PO List");
+        }
     });
 });
-
-async function fetchPoList(unitCode, addressCode, userId) {
-    try {
-        const token = await generateToken(userId),
-            legApi = await cds.connect.to('Legacy'),
-            response = await legApi.send({
-                query: `GET GetPOPSList?RequestBy='${userId}'&UnitCode='${unitCode}'&AddressCode='${addressCode}'`,
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-            });
-
-        if (response.d) {
-            return JSON.parse(response.d);
-        } else {
-            console.error('Error parsing response:', response.data);
-            throw new Error('Error parsing the response from the API.');
-        }
-    } catch (error) {
-        console.error('Error in GetPOPSList API call:', error);
-        throw new Error('Unable to fetch PO List:', error);
-    }
-}
-
-async function fetchMaterialList(UnitCode, ItemCode, ItemDescription, userId) {
-    try {
-        const token = await generateToken(userId),
-            legApi = await cds.connect.to('Legacy'),
-            response = await legApi.send({
-                query: `GET GetMaterialList?RequestBy='${userId}'&UnitCode='${UnitCode}'&ItemCode='${ItemCode}'&ItemDescription='${ItemDescription}'`,
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-            });
-
-        if (response.d) {
-            return JSON.parse(response.d);
-        } else {
-            console.error('Error parsing response:', response.data);
-            throw new Error('Error parsing the response from the API.');
-        }
-    } catch (error) {
-        console.error('Error in getMaterialList API call:', error);
-        throw new Error('Unable to fetch Material List:', error);
-    }
-}
 
 const _fetchJwtToken = async function (oauthUrl, oauthClient, oauthSecret) {
 

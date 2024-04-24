@@ -19,7 +19,6 @@ sap.ui.define([
                 this.getView().setModel(new JSONModel({}), "Filter");
                 this.getView().setModel(new JSONModel([]), "PoList");
 
-                this.unitCode = sessionStorage.getItem("unitCode") || "P05";
                 this.addressCode = sessionStorage.getItem("AddressCode") || 'GPL-01-01';
             },
 
@@ -80,35 +79,36 @@ sap.ui.define([
                             this.toAddress = obj.createdBy;
                             this.payload = { Action: selectedAction };
 
+                            const remarksFrag = sap.ui.xmlfragment("com.extension.porequest.fragment.Remarks", this),
+                                title = selectedAction === "A" ? "Approval" : "Rejection";
+                            this.getView().addDependent(remarksFrag);
+                            remarksFrag.setTitle(title);
+                            remarksFrag.open();
+                            this.getView().getModel("PoList").setData([]);
+                            this.getView().getModel("PoList").refresh(true);
+
                             if (selectedAction === "A") {
                                 sap.ui.getCore().byId("po").setVisible(true);
-
-                                // return new Promise(function (resolve, reject) {
-                                //     this.getView().getModel().callFunction("/getPoList", {
-                                //         method: "GET",
-                                //         urlParameters: {
-                                //             unitCode: this.unitCode,
-                                //             addressCode: this.addressCode
-                                //         },
-                                //         success: function (oData, response) {
-                                //             this.getView().getModel("PoList").setData(oData.results);
-                                //             this.getView().getModel("PoList").refresh(true);
-
-                                const remarksFrag = sap.ui.xmlfragment("com.extension.porequest.fragment.Remarks", this);
-                                this.getView().addDependent(remarksFrag);
-                                const title = selectedAction === "A" ? "Approval" : "Rejection";
-
-                                remarksFrag.setTitle(title);
-                                remarksFrag.open();
-
-                                resolve();
-
-                                //         }.bind(this),
-                                //         error: function (oError) {
-                                //             reject(oError);
-                                //         }
-                                //     });
-                                // }.bind(this));
+                                BusyIndicator.show();
+                                return new Promise(function (resolve, reject) {
+                                    this.getView().getModel().callFunction("/getPoList", {
+                                        method: "GET",
+                                        urlParameters: {
+                                            unitCode: obj.PurchaseCode,
+                                            addressCode: this.addressCode
+                                        },
+                                        success: function (oData) {
+                                            BusyIndicator.hide();
+                                            this.getView().getModel("PoList").setData(oData.results);
+                                            this.getView().getModel("PoList").refresh(true);
+                                            resolve();
+                                        }.bind(this),
+                                        error: function (oError) {
+                                            BusyIndicator.hide();
+                                            reject(oError);
+                                        }
+                                    });
+                                }.bind(this));
                             } else {
                                 sap.ui.getCore().byId("po").setVisible(false);
                             }
@@ -124,7 +124,7 @@ sap.ui.define([
                 if (this.validateReqFields(reqFields)) {
                     this.payload.ApproverRemarks = sap.ui.getCore().byId("remarks").getValue();
                     if (this.payload.Action === "A") {
-                        this.payload.PONumber = sap.ui.getCore().byId("po").getValue();
+                        this.payload.PONumber = sap.ui.getCore().byId("po").getSelectedKey();
                     }
                     this.takeAction();
                 } else {

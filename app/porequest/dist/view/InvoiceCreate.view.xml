@@ -156,11 +156,19 @@
                     design="Bold"
                     text="Requestor Contact No."
                 />
-                <Input
+                <MaskInput
                     id="reqcon"
-                    type="Number"
-                    value="{path:'HeaderModel>/RequestorContact',type:'sap.ui.model.type.String',constraints:{minLength: 10,maxLength:10}}"
-                />
+                    mask="CCCCCCCCCC"
+                    value="{HeaderModel>/RequestorContact}"
+                >
+                    <rules>
+                        <MaskInputRule
+                            id="_IDGenMaskInputRule1"
+                            maskFormatSymbol="C"
+                            regex="[0-9]"
+                        />
+                    </rules>
+                </MaskInput>
                 <Label
                     id="_IDGenLabel14"
                     required="true"
@@ -170,8 +178,26 @@
                 <Input
                     id="reqemail"
                     type="Email"
-                    value="{path:'HeaderModel>/RequestorEmail',type:'.customEMailType'}"
+                    value="{HeaderModel>/RequestorEmail}"
                 />
+                <Label
+                    id="_IDGenLabel112"
+                    required="true"
+                    design="Bold"
+                    text="Purchase Code"
+                />
+                <Select
+                    id="pCode"
+                    forceSelection="false"
+                    selectedKey="{HeaderModel>/PurchaseCode}"
+                    items="{CodeDetails>/}"
+                >
+                    <core:Item
+                        id="_IDGenItem2"
+                        key="{CodeDetails>code}"
+                        text="{CodeDetails>code}"
+                    />
+                </Select>
             </f:content>
         </f:SimpleForm>
         <IconTabBar
