@@ -184,12 +184,12 @@
                     id="_IDGenLabel112"
                     required="true"
                     design="Bold"
-                    text="Purchase Code"
+                    text="Plant Code"
                 />
                 <Select
                     id="pCode"
                     forceSelection="false"
-                    selectedKey="{HeaderModel>/PurchaseCode}"
+                    selectedKey="{HeaderModel>/PlantCode}"
                     items="{CodeDetails>/}"
                 >
                     <core:Item

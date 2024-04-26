@@ -16,8 +16,6 @@ sap.ui.define([
             this.router.attachRouteMatched(this.handleRouteMatched, this);
 
             this.getView().setModel(new JSONModel([]), "AttachmentModel");
-            this.getView().setModel(new JSONModel(sessionStorage.getItem("CodeDetails") || [{ "code": "P39" }]), "CodeDetails");
-
             this.byId("invCreateTable").setSticky(["ColumnHeaders", "HeaderToolbar"]);
         },
 
@@ -25,6 +23,9 @@ sap.ui.define([
             if (evt.getParameter("name") !== "InvoiceCreate") {
                 return;
             }
+            const cData = JSON.parse(sessionStorage.getItem("CodeDetails")) || [{ "code": "P39" }];
+            this.getView().setModel(new JSONModel(cData), "CodeDetails");
+
             this.byId("attachment").setUploadEnabled(true).removeAllItems();
             this.byId("attachment").setUploadUrl(this.getView().getModel().sServiceUrl + "/Attachments");
 

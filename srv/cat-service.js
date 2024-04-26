@@ -34,12 +34,12 @@ module.exports = cds.service.impl(async function () {
 
         if (req.data.Action === "A") {
 
-            const records = await cds.run(cds.parse.cql("Select PONumber from db.porequest.PoList")),
-                duplicatePo = records.filter(item => item.PONumber === req.data.PONumber);
+            // const records = await cds.run(cds.parse.cql("Select PONumber from db.porequest.PoList")),
+            //     duplicatePo = records.filter(item => item.PONumber === req.data.PONumber);
 
-            if (duplicatePo.length > 0) {
-                req.reject(400, 'Duplicate po number');
-            }
+            // if (duplicatePo.length > 0) {
+            //     req.reject(400, 'Duplicate po number');
+            // }
             req.data.Status = "ABP" // approved by purchase
 
         } else if (req.data.Action === "E") {
@@ -51,6 +51,8 @@ module.exports = cds.service.impl(async function () {
         } else {
             req.data.Status = "RBP" // rejected by purchase
         }
+
+        req.data.AddressCode = req.headers.loginId;
     });
 
     this.before('CREATE', 'PoList', async (req) => {
@@ -68,6 +70,7 @@ module.exports = cds.service.impl(async function () {
 
         req.data.Status = "PWP"; // pending with purchase
         req.data.Id = Math.random().toString().substr(2, 6);
+        req.data.AddressCode = req.headers.loginid;
 
         const connJwtToken = await _fetchJwtToken(sdmCredentials.url, sdmCredentials.clientid, sdmCredentials.clientsecret);
 
@@ -100,14 +103,15 @@ module.exports = cds.service.impl(async function () {
             ToAddress: toAddress,
             CCAddress: "",
             BCCAddress: "",
-            CreatedBy: "Manikandan"
+            CreatedBy: req.headers.loginid
         };
         try {
-            const legApi = await cds.connect.to('Legacy'),
+            const token = await generateToken(req.headers.loginid),
+                legApi = await cds.connect.to('Legacy'),
                 response = await legApi.send({
                     query: `POST SendMail`,
                     headers: {
-                        'Authorization': 'Bearer IncMpsaotdlKHYyyfGiVDg==',
+                        'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
                     },
                     data: payload
@@ -124,14 +128,11 @@ module.exports = cds.service.impl(async function () {
 
     this.on('getMaterialList', async (req) => {
         const { UnitCode, ItemCode, ItemDescription } = req.data;
-        if (req.user.id === "anonymous") {
-            req.user.id = "samarnahak@kpmg.com";
-        }
         try {
-            const token = await generateToken(req.user.id),
+            const token = await generateToken(req.headers.loginid),
                 legApi = await cds.connect.to('Legacy'),
                 response = await legApi.send({
-                    query: `GET GetMaterialList?RequestBy='${req.user.id}'&UnitCode='${UnitCode}'&ItemCode='${ItemCode}'&ItemDescription='${ItemDescription}'`,
+                    query: `GET GetMaterialList?RequestBy='${req.headers.loginid}'&UnitCode='${UnitCode}'&ItemCode='${ItemCode}'&ItemDescription='${ItemDescription}'`,
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
@@ -150,14 +151,11 @@ module.exports = cds.service.impl(async function () {
 
     this.on('getPoList', async (req) => {
         const { unitCode, addressCode } = req.data;
-        if (req.user.id === "anonymous") {
-            req.user.id = "samarnahak@kpmg.com";
-        }
         try {
-            const token = await generateToken(req.user.id),
+            const token = await generateToken(req.headers.loginid),
                 legApi = await cds.connect.to('Legacy'),
                 response = await legApi.send({
-                    query: `GET GetPOPSList?RequestBy='${req.user.id}'&UnitCode='${unitCode}'&AddressCode='${addressCode}'`,
+                    query: `GET GetPOPSList?RequestBy='${req.headers.loginid}'&UnitCode='${unitCode}'&AddressCode='${addressCode}'`,
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'

@@ -17,7 +17,7 @@
             editable="false"
             layout="ColumnLayout"
             columnsM="2"
-            columnsL="2"
+            columnsL="3"
             columnsXL="4"
         >
             <f:content>
@@ -56,6 +56,51 @@
                 <Text
                     id="_IDGenText131"
                     text="{HeaderModel>/GSTAmt}"
+                />
+                <Label
+                    id="_IDGenLabel111"
+                    design="Bold"
+                    text="Requestor Name"
+                />
+                <Text
+                    id="_IDGenText115"
+                    text="{HeaderModel>/RequestorName}"
+                />
+                <Label
+                    id="_IDGenLabel120"
+                    design="Bold"
+                    text="Requestor Department"
+                />
+                <Text
+                    id="_IDGenText126"
+                    text="{HeaderModel>/RequestorDepartment}"
+                />
+                <Label
+                    id="_IDGenLabel130"
+                    design="Bold"
+                    text="Requestor Contact No."
+                />
+                <Text
+                    id="_IDGenText133"
+                    text="{HeaderModel>/RequestorContact}"
+                />
+                <Label
+                    id="_IDGenLabel14"
+                    design="Bold"
+                    text="Requestor Email ID"
+                />
+                <Text
+                    id="_IDGenText144"
+                    text="{HeaderModel>/RequestorEmail}"
+                />
+                <Label
+                    id="_IDGenLabel112"
+                    design="Bold"
+                    text="Plant Code"
+                />
+                <Text
+                    id="_IDGenText155"
+                    text="{HeaderModel>/PlantCode}"
                 />
             </f:content>
         </f:SimpleForm>

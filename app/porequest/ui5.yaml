@@ -16,3 +16,6 @@ server:
         backend:
           - path: /
             destination: Legacy
+          - path: /po
+            url: https://impautosuppdev-dev-purchaseorder-srv.cfapps.ap10.hana.ondemand.com
+            destination: PurchaseOrder_SRV

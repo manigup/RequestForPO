@@ -21,7 +21,8 @@ entity PoList : managed {
       RequestorContact    : String default '';
       RequestorEmail      : String default '';
       ApproverRemarks     : String default '';
-      PurchaseCode        : String default '';
+      AddressCode         : String default '';
+      PlantCode           : String default '';
       Action              : String(1) default '';
       Status              : String;
       Items               : Composition of many PoListItems

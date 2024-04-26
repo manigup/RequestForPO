@@ -23,6 +23,16 @@
                     "annotations": [],
                     "odataVersion": "2.0"
                 }
+            },
+            "poService": {
+                "uri": "po/odata/v4/catalog/",
+                "type": "OData",
+                "settings": {
+                    "defaultCountMode": "None",
+                    "annotations": [],
+                    "localUri": "localService/metadata.xml",
+                    "odataVersion": "2.0"
+                }
             }
         },
         "crossNavigation": {
@@ -93,6 +103,14 @@
                     "useBatch": false,
                     "refreshAfterChange": false,
                     "defaultCountMode": "None"
+                }
+            },
+            "po": {
+                "dataSource": "poService",
+                "preload": true,
+                "settings": {
+                    "defaultCountMode": "None",
+                    "useBatch": false
                 }
             }
         },

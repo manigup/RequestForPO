@@ -24,11 +24,12 @@
                 id="po"
                 forceSelection="false"
                 items="{PoList>/}"
+                change="onPoNumberChange"
             >
                 <core:Item
                     id="_IDGenItem1"
-                    key="{PoList>TrnRefNumber}"
-                    text="{PoList>TrnRefNumber}"
+                    key="{PoList>PoNum}"
+                    text="{PoList>PoNum}"
                 />
             </Select>
             <Label

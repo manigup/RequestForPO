@@ -18,8 +18,6 @@ sap.ui.define([
                 this.tblTemp = this.byId("uploadTblTemp").clone();
                 this.getView().setModel(new JSONModel({}), "Filter");
                 this.getView().setModel(new JSONModel([]), "PoList");
-
-                this.addressCode = sessionStorage.getItem("AddressCode") || 'GPL-01-01';
             },
 
             onAfterRendering: function () {
@@ -36,6 +34,9 @@ sap.ui.define([
                 });
                 this.byId("uploadTbl").bindAggregation("items", {
                     path: "/PoList",
+                    parameters: {
+                        expand: "Items"
+                    },
                     filters: oFilters,
                     template: this.tblTemp
                 });
@@ -68,15 +69,15 @@ sap.ui.define([
 
             onActionChange: function (evt) {
                 const source = evt.getSource(),
-                    obj = source.getBindingContext().getObject(),
                     selectedAction = source.getSelectedKey();
                 this.actionEvt = evt.getSource();
+                this.obj = source.getBindingContext().getObject();
                 MessageBox.confirm("Are you sure ?", {
                     onClose: (action) => {
                         if (action === "YES") {
-                            this.invNo = obj.InvoiceNumber;
-                            this.id = obj.Id;
-                            this.toAddress = obj.createdBy;
+                            this.invNo = this.obj.InvoiceNumber;
+                            this.id = this.obj.Id;
+                            this.toAddress = this.obj.createdBy;
                             this.payload = { Action: selectedAction };
 
                             const remarksFrag = sap.ui.xmlfragment("com.extension.porequest.fragment.Remarks", this),
@@ -90,25 +91,46 @@ sap.ui.define([
                             if (selectedAction === "A") {
                                 sap.ui.getCore().byId("po").setVisible(true);
                                 BusyIndicator.show();
-                                return new Promise(function (resolve, reject) {
-                                    this.getView().getModel().callFunction("/getPoList", {
-                                        method: "GET",
-                                        urlParameters: {
-                                            unitCode: obj.PurchaseCode,
-                                            addressCode: this.addressCode
-                                        },
-                                        success: function (oData) {
-                                            BusyIndicator.hide();
-                                            this.getView().getModel("PoList").setData(oData.results);
+                                // return new Promise((resolve, reject) => {
+                                // this.getView().getModel().callFunction("/getPoList", {
+                                //     method: "GET",
+                                //     urlParameters: {
+                                //         unitCode: obj.PurchaseCode,
+                                //         addressCode: this.addressCode
+                                //     },
+                                //     success: function (oData) {
+                                //         BusyIndicator.hide();
+                                //         this.getView().getModel("PoList").setData(oData.results);
+                                //         this.getView().getModel("PoList").refresh(true);
+                                //         resolve();
+                                //     }.bind(this),
+                                //     error: function (oError) {
+                                //         BusyIndicator.hide();
+                                //         reject(oError);
+                                //     }
+                                // });
+                                this.getView().getModel("po").read("/PurchaseOrders", {
+                                    urlParameters: {
+                                        "$expand": "DocumentRows",
+                                        AddressCode: this.obj.AddressCode,
+                                        UnitCode: this.obj.PlantCode
+                                    },
+                                    success: (oData) => {
+                                        BusyIndicator.hide();
+                                        const fData = oData.results.filter(item => item.HasAttachments !== "Invoice Submitted");
+                                        if (fData.length > 0) {
+                                            this.getView().getModel("PoList").setData(fData);
                                             this.getView().getModel("PoList").refresh(true);
-                                            resolve();
-                                        }.bind(this),
-                                        error: function (oError) {
-                                            BusyIndicator.hide();
-                                            reject(oError);
+                                        } else {
+                                            MessageBox.error("Po List is Empty");
                                         }
-                                    });
-                                }.bind(this));
+                                    },
+                                    error: (error) => {
+                                        BusyIndicator.hide();
+                                        MessageBox.error(JSON.parse(error.responseText).error.message.value);
+                                    }
+                                });
+                                // });
                             } else {
                                 sap.ui.getCore().byId("po").setVisible(false);
                             }
@@ -131,9 +153,40 @@ sap.ui.define([
                     MessageBox.error("Please fill all required inputs to proceed");
                 }
             },
+
             onDialogCancel: function (evt) {
                 this.actionEvt.setSelectedKey();
                 evt.getSource().getParent().destroy();
+            },
+
+            onPoNumberChange: function (evt) {
+                this.poEntryPayload = evt.getParameter("selectedItem").getBindingContext("PoList").getObject();
+            },
+
+            createPoEntry: function () {
+                BusyIndicator.show();
+                const payload = {
+                    "PNum_PoNum": this.poEntryPayload.PoNum.replace(/\//g, '-'),
+                    "PlantName": this.poEntryPayload.PlantName,
+                    "PlantCode": this.poEntryPayload.PlantCode,
+                    "BillDate": this.obj.InvoiceNumber,
+                    "BillNumber": this.obj.InvoiceDate,
+                    "EwayBillNumber": this.obj.EwayBillNumber,
+                    "EwayBillDate": this.obj.EwayBillDate,
+                    "TotalCGstAmnt": this.obj.Items.results[0].CGSTAmt,
+                    "TotalSGstAmnt": this.obj.Items.results[0].SGSTAmt,
+                    "TotalIGstAmnt": this.obj.Items.results[0].IGSTAmt,
+                    "TotalAmnt": this.obj.TotalInvoiceAmount,
+                };
+                this.getView().getModel("po").create("/ASNListHeader", payload, {
+                    success: () => {
+                        BusyIndicator.hide();
+                    },
+                    error: (responseText) => {
+                        BusyIndicator.hide();
+                        MessageBox.error(JSON.parse(responseText).error.message.value);
+                    }
+                });
             },
 
             takeAction: function () {
@@ -155,6 +208,7 @@ sap.ui.define([
                                     this.sendEmailNotification("Invoice " + this.invNo + content);
                                     this.dialogSource.getParent().destroy();
                                     this.getData();
+                                    this.createPoEntry();
                                 }
                             });
                         },
