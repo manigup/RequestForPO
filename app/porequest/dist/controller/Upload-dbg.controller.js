@@ -159,36 +159,6 @@ sap.ui.define([
                 evt.getSource().getParent().destroy();
             },
 
-            onPoNumberChange: function (evt) {
-                this.poEntryPayload = evt.getParameter("selectedItem").getBindingContext("PoList").getObject();
-            },
-
-            createPoEntry: function () {
-                BusyIndicator.show();
-                const payload = {
-                    "PNum_PoNum": this.poEntryPayload.PoNum.replace(/\//g, '-'),
-                    "PlantName": this.poEntryPayload.PlantName,
-                    "PlantCode": this.poEntryPayload.PlantCode,
-                    "BillDate": this.obj.InvoiceNumber,
-                    "BillNumber": this.obj.InvoiceDate,
-                    "EwayBillNumber": this.obj.EwayBillNumber,
-                    "EwayBillDate": this.obj.EwayBillDate,
-                    "TotalCGstAmnt": this.obj.Items.results[0].CGSTAmt,
-                    "TotalSGstAmnt": this.obj.Items.results[0].SGSTAmt,
-                    "TotalIGstAmnt": this.obj.Items.results[0].IGSTAmt,
-                    "TotalAmnt": this.obj.TotalInvoiceAmount,
-                };
-                this.getView().getModel("po").create("/ASNListHeader", payload, {
-                    success: () => {
-                        BusyIndicator.hide();
-                    },
-                    error: (responseText) => {
-                        BusyIndicator.hide();
-                        MessageBox.error(JSON.parse(responseText).error.message.value);
-                    }
-                });
-            },
-
             takeAction: function () {
                 setTimeout(() => {
                     this.getView().getModel().update("/PoList(Id='" + this.id + "',InvoiceNumber='" + this.invNo + "')", this.payload, {

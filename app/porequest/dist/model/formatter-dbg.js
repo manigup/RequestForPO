@@ -1,17 +1,17 @@
 jQuery.sap.declare("formatter");
 formatter = {
     onNavBack: function () {
-		var oHistory = sap.ui.core.routing.History.getInstance();
-		var sPreviousHash = oHistory.getPreviousHash();
+        var oHistory = sap.ui.core.routing.History.getInstance();
+        var sPreviousHash = oHistory.getPreviousHash();
 
-		if (sPreviousHash !== undefined) {
-			window.history.go(-1);
-		} else {
-			var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
-			oRouter.navTo("Upload", {}, true);
-		}
+        if (sPreviousHash !== undefined) {
+            window.history.go(-1);
+        } else {
+            var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+            oRouter.navTo("Upload", {}, true);
+        }
 
-	},
+    },
     formatDate: function (oDate) {
         if (oDate && oDate !== "00000000") {
             return sap.ui.core.format.DateFormat.getDateInstance({
@@ -56,8 +56,7 @@ formatter = {
         return state;
     },
     checkApprovalAccess: function (status, approver) {
-        const logUser = this.getModel().getHeaders().loginId;
-        if (status === "PWP" && approver === logUser) {
+        if (status === "PWP" && approver === sap.ui.getCore().loginEmail) {
             return true;
         } else {
             return false;

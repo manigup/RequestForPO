@@ -58,6 +58,11 @@ sap.ui.define([
                     "loginType": loginType
                 });
 
+                this.getModel("po").setHeaders({
+                    "loginId": loginId,
+                    "loginType": loginType
+                });
+
                 // enable routing
                 this.getRouter().initialize();
             },

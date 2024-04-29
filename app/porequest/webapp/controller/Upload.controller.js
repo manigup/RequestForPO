@@ -34,9 +34,6 @@ sap.ui.define([
                 });
                 this.byId("uploadTbl").bindAggregation("items", {
                     path: "/PoList",
-                    parameters: {
-                        expand: "Items"
-                    },
                     filters: oFilters,
                     template: this.tblTemp
                 });
@@ -160,7 +157,18 @@ sap.ui.define([
             },
 
             onPoNumberChange: function (evt) {
+                BusyIndicator.show();
                 this.poEntryPayload = evt.getParameter("selectedItem").getBindingContext("PoList").getObject();
+                this.getView().getModel().read("/PoList(Id='" + this.obj.Id + "',InvoiceNumber='" + this.obj.InvoiceNumber + "')/Items", {
+                    success: (oData) => {
+                        this.obj.Items = oData.results[0];
+                        BusyIndicator.hide();
+                    },
+                    error: (error) => {
+                        BusyIndicator.hide();
+                        MessageBox.error(JSON.parse(error.responseText).error.message.value);
+                    }
+                });
             },
 
             createPoEntry: function () {
@@ -169,18 +177,64 @@ sap.ui.define([
                     "PNum_PoNum": this.poEntryPayload.PoNum.replace(/\//g, '-'),
                     "PlantName": this.poEntryPayload.PlantName,
                     "PlantCode": this.poEntryPayload.PlantCode,
-                    "BillDate": this.obj.InvoiceNumber,
-                    "BillNumber": this.obj.InvoiceDate,
+                    "BillDate": this.obj.InvoiceDate,
+                    "BillNumber": this.obj.InvoiceNumber,
                     "EwayBillNumber": this.obj.EwayBillNumber,
                     "EwayBillDate": this.obj.EwayBillDate,
-                    "TotalCGstAmnt": this.obj.Items.results[0].CGSTAmt,
-                    "TotalSGstAmnt": this.obj.Items.results[0].SGSTAmt,
-                    "TotalIGstAmnt": this.obj.Items.results[0].IGSTAmt,
+                    "TotalCGstAmnt": this.obj.Items.CGSTAmt,
+                    "TotalSGstAmnt": this.obj.Items.SGSTAmt,
+                    "TotalIGstAmnt": this.obj.Items.IGSTAmt,
                     "TotalAmnt": this.obj.TotalInvoiceAmount,
                 };
                 this.getView().getModel("po").create("/ASNListHeader", payload, {
                     success: () => {
                         BusyIndicator.hide();
+                        let invListPayload = [];
+                        const payData = JSON.stringify(this.poEntryPayload.DocumentRows.results.map(item => {
+                            delete item.__metadata;
+                            delete item.PNum;
+                            item.InvQty = item.PoQty;
+                            item.InvBalQty = 0;
+                            invListPayload.push({
+                                REF_INV: this.obj.InvoiceNumber,
+                                Item_Code: item.ItemCode,
+                                Po_Num: item.PNum_PoNum,
+                                INVOICE_DATE: this.obj.InvoiceDate,
+                                INVOICE_AMT: this.obj.TotalInvoiceAmount,
+                                IGST_AMT: this.obj.Items.IGSTAmt,
+                                CGST_AMT: this.obj.Items.CGSTAmt,
+                                SGST_AMT: this.obj.Items.SGSTAmt,
+                                Po_Qty: item.PoQty,
+                                Inv_Qty: item.PoQty,
+                                InvBal_Qty: 0,
+                                INV_DELETE: false
+                            });
+                            return item;
+                        }));
+                        let settings = {
+                            async: true,
+                            url: jQuery.sap.getModulePath("com/extension/porequest") + "/po/odata/v4/catalog/stageDocumentRows",
+                            method: "POST",
+                            headers: {
+                                "content-type": "application/json"
+                            },
+                            processData: false,
+                            data: JSON.stringify({ data: payData })
+                        };
+                        $.ajax(settings)
+                            .done(() => {
+                                settings = {
+                                    async: true,
+                                    url: jQuery.sap.getModulePath("com/extension/porequest") + "/po/odata/v4/catalog/stageInvHeaderList",
+                                    method: "POST",
+                                    headers: {
+                                        "content-type": "application/json"
+                                    },
+                                    processData: false,
+                                    data: JSON.stringify({ data: JSON.stringify(invListPayload) })
+                                };
+                                $.ajax(settings);
+                            });
                     },
                     error: (responseText) => {
                         BusyIndicator.hide();
