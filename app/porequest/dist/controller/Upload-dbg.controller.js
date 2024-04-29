@@ -34,9 +34,6 @@ sap.ui.define([
                 });
                 this.byId("uploadTbl").bindAggregation("items", {
                     path: "/PoList",
-                    parameters: {
-                        expand: "Items"
-                    },
                     filters: oFilters,
                     template: this.tblTemp
                 });
@@ -159,28 +156,115 @@ sap.ui.define([
                 evt.getSource().getParent().destroy();
             },
 
+            onPoNumberChange: function (evt) {
+                BusyIndicator.show();
+                this.poEntryPayload = evt.getParameter("selectedItem").getBindingContext("PoList").getObject();
+                this.getView().getModel().read("/PoList(Id='" + this.obj.Id + "',InvoiceNumber='" + this.obj.InvoiceNumber + "')/Items", {
+                    success: (oData) => {
+                        this.obj.Items = oData.results[0];
+                        BusyIndicator.hide();
+                    },
+                    error: (error) => {
+                        BusyIndicator.hide();
+                        MessageBox.error(JSON.parse(error.responseText).error.message.value);
+                    }
+                });
+            },
+
+            createPoEntry: function () {
+                const payload = {
+                    "PNum_PoNum": this.poEntryPayload.PoNum.replace(/\//g, '-'),
+                    "PlantName": this.poEntryPayload.PlantName,
+                    "PlantCode": this.poEntryPayload.PlantCode,
+                    "BillDate": this.obj.InvoiceDate,
+                    "BillNumber": this.obj.InvoiceNumber,
+                    "EwayBillNumber": this.obj.EwayBillNumber,
+                    "EwayBillDate": this.obj.EwayBillDate,
+                    "TotalCGstAmnt": this.obj.Items.CGSTAmt,
+                    "TotalSGstAmnt": this.obj.Items.SGSTAmt,
+                    "TotalIGstAmnt": this.obj.Items.IGSTAmt,
+                    "TotalAmnt": this.obj.TotalInvoiceAmount,
+                };
+                this.getView().getModel("po").create("/ASNListHeader", payload, {
+                    success: () => {
+                        let invListPayload = [];
+                        const payData = JSON.stringify(this.poEntryPayload.DocumentRows.results.map(item => {
+                            delete item.__metadata;
+                            delete item.PNum;
+                            item.InvQty = item.PoQty;
+                            item.InvBalQty = 0;
+                            invListPayload.push({
+                                REF_INV: this.obj.InvoiceNumber,
+                                Item_Code: item.ItemCode,
+                                Po_Num: item.PNum_PoNum,
+                                INVOICE_DATE: this.obj.InvoiceDate,
+                                INVOICE_AMT: this.obj.TotalInvoiceAmount,
+                                IGST_AMT: this.obj.Items.IGSTAmt,
+                                CGST_AMT: this.obj.Items.CGSTAmt,
+                                SGST_AMT: this.obj.Items.SGSTAmt,
+                                Po_Qty: item.PoQty,
+                                Inv_Qty: item.PoQty,
+                                InvBal_Qty: 0,
+                                INV_DELETE: false
+                            });
+                            return item;
+                        }));
+                        let settings = {
+                            async: true,
+                            url: jQuery.sap.getModulePath("com/extension/porequest") + "/po/odata/v4/catalog/stageDocumentRows",
+                            method: "POST",
+                            headers: {
+                                "content-type": "application/json"
+                            },
+                            processData: false,
+                            data: JSON.stringify({ data: payData })
+                        };
+                        $.ajax(settings)
+                            .done(() => {
+                                settings = {
+                                    async: true,
+                                    url: jQuery.sap.getModulePath("com/extension/porequest") + "/po/odata/v4/catalog/stageInvHeaderList",
+                                    method: "POST",
+                                    headers: {
+                                        "content-type": "application/json"
+                                    },
+                                    processData: false,
+                                    data: JSON.stringify({ data: JSON.stringify(invListPayload) })
+                                };
+                                $.ajax(settings).done(() => {
+                                    BusyIndicator.hide();
+                                    MessageBox.success("Action taken successfully", {
+                                        onClose: () => {
+                                            let content;
+                                            switch (this.payload.Action) {
+                                                case "A":
+                                                    content = " approved by purchase team.";
+                                                    break;
+                                                case "R":
+                                                    content = " rejected by purchase team.";
+                                                    break;
+                                            }
+                                            this.sendEmailNotification("Invoice " + this.invNo + content);
+                                            this.dialogSource.getParent().destroy();
+                                            this.getData();
+                                        }
+                                    });
+                                });
+                            });
+                    },
+                    error: (responseText) => {
+                        BusyIndicator.hide();
+                        MessageBox.error(JSON.parse(responseText).error.message.value);
+                    }
+                });
+            },
+
             takeAction: function () {
+                BusyIndicator.show();
                 setTimeout(() => {
                     this.getView().getModel().update("/PoList(Id='" + this.id + "',InvoiceNumber='" + this.invNo + "')", this.payload, {
                         success: () => {
-                            BusyIndicator.hide();
-                            MessageBox.success("Action taken successfully", {
-                                onClose: () => {
-                                    let content;
-                                    switch (this.payload.Action) {
-                                        case "A":
-                                            content = " approved by purchase team.";
-                                            break;
-                                        case "R":
-                                            content = " rejected by purchase team.";
-                                            break;
-                                    }
-                                    this.sendEmailNotification("Invoice " + this.invNo + content);
-                                    this.dialogSource.getParent().destroy();
-                                    this.getData();
-                                    this.createPoEntry();
-                                }
-                            });
+                            this.createPoEntry();
                         },
                         error: () => BusyIndicator.hide()
                     });

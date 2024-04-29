@@ -172,7 +172,6 @@ sap.ui.define([
             },
 
             createPoEntry: function () {
-                BusyIndicator.show();
                 const payload = {
                     "PNum_PoNum": this.poEntryPayload.PoNum.replace(/\//g, '-'),
                     "PlantName": this.poEntryPayload.PlantName,
@@ -188,7 +187,6 @@ sap.ui.define([
                 };
                 this.getView().getModel("po").create("/ASNListHeader", payload, {
                     success: () => {
-                        BusyIndicator.hide();
                         let invListPayload = [];
                         const payData = JSON.stringify(this.poEntryPayload.DocumentRows.results.map(item => {
                             delete item.__metadata;
@@ -233,7 +231,25 @@ sap.ui.define([
                                     processData: false,
                                     data: JSON.stringify({ data: JSON.stringify(invListPayload) })
                                 };
-                                $.ajax(settings);
+                                $.ajax(settings).done(() => {
+                                    BusyIndicator.hide();
+                                    MessageBox.success("Action taken successfully", {
+                                        onClose: () => {
+                                            let content;
+                                            switch (this.payload.Action) {
+                                                case "A":
+                                                    content = " approved by purchase team.";
+                                                    break;
+                                                case "R":
+                                                    content = " rejected by purchase team.";
+                                                    break;
+                                            }
+                                            this.sendEmailNotification("Invoice " + this.invNo + content);
+                                            this.dialogSource.getParent().destroy();
+                                            this.getData();
+                                        }
+                                    });
+                                });
                             });
                     },
                     error: (responseText) => {
@@ -244,27 +260,11 @@ sap.ui.define([
             },
 
             takeAction: function () {
+                BusyIndicator.show();
                 setTimeout(() => {
                     this.getView().getModel().update("/PoList(Id='" + this.id + "',InvoiceNumber='" + this.invNo + "')", this.payload, {
                         success: () => {
-                            BusyIndicator.hide();
-                            MessageBox.success("Action taken successfully", {
-                                onClose: () => {
-                                    let content;
-                                    switch (this.payload.Action) {
-                                        case "A":
-                                            content = " approved by purchase team.";
-                                            break;
-                                        case "R":
-                                            content = " rejected by purchase team.";
-                                            break;
-                                    }
-                                    this.sendEmailNotification("Invoice " + this.invNo + content);
-                                    this.dialogSource.getParent().destroy();
-                                    this.getData();
-                                    this.createPoEntry();
-                                }
-                            });
+                            this.createPoEntry();
                         },
                         error: () => BusyIndicator.hide()
                     });
