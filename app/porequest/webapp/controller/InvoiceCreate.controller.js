@@ -126,13 +126,8 @@ sap.ui.define([
 
         onAddItems: function () {
             var itemData = this.getView().getModel("ItemModel").getData()
-            if (itemData.length > 0) {
-                MessageBox.error("Cannot add more than one item");
-            }
-            else {
-                this.getView().getModel("ItemModel").getData().push({});
-                this.getView().getModel("ItemModel").refresh(true);
-            }
+            this.getView().getModel("ItemModel").getData().push({});
+            this.getView().getModel("ItemModel").refresh(true);
         },
 
         onCreatePress: function () {
